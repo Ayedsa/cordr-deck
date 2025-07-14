@@ -150,21 +150,21 @@
                     <h3 class="text-blue-600" data-lang-en="Annual Subscriptions" data-lang-ar="الاشتراكات السنوية">Annual Subscriptions</h3>
                     <div class="flex items-center justify-between mt-2">
                         <span class="text-2xl font-bold text-blue-600" id="subscriptionPercent">25%</span>
-                        <input type="range" id="subscriptionSlider" min="0" max="100" value="25" class="w-20" onchange="updateRevenueBreakdown()">
+                        <input type="range" id="subscriptionSlider" min="0" max="100" value="25" class="w-20" oninput="updateRevenueBreakdown()">
                     </div>
                 </div>
                 <div class="bg-green-50 p-6 rounded-lg">
                     <h3 class="text-green-600" data-lang-en="Ride Commissions" data-lang-ar="عمولات الرحلات">Ride Commissions</h3>
                     <div class="flex items-center justify-between mt-2">
                         <span class="text-2xl font-bold text-green-600" id="commissionPercent">60%</span>
-                        <input type="range" id="commissionSlider" min="0" max="100" value="60" class="w-20" onchange="updateRevenueBreakdown()">
+                        <input type="range" id="commissionSlider" min="0" max="100" value="60" class="w-20" oninput="updateRevenueBreakdown()">
                     </div>
                 </div>
                 <div class="bg-purple-50 p-6 rounded-lg">
                     <h3 class="text-purple-600" data-lang-en="Additional Services" data-lang-ar="الخدمات الإضافية">Additional Services</h3>
                     <div class="flex items-center justify-between mt-2">
                         <span class="text-2xl font-bold text-purple-600" id="servicesPercent">15%</span>
-                        <input type="range" id="servicesSlider" min="0" max="100" value="15" class="w-20" onchange="updateRevenueBreakdown()">
+                        <input type="range" id="servicesSlider" min="0" max="100" value="15" class="w-20" oninput="updateRevenueBreakdown()">
                     </div>
                 </div>
             </div>
@@ -331,29 +331,32 @@
 
         // Revenue breakdown
         function updateRevenueBreakdown() {
-            const subscriptions = parseInt(document.getElementById('subscriptionSlider').value);
-            const commissions = parseInt(document.getElementById('commissionSlider').value);
-            const services = parseInt(document.getElementById('servicesSlider').value);
-            
-            const total = subscriptions + commissions + services;
+            let subscriptions = parseInt(document.getElementById('subscriptionSlider').value);
+            let commissions   = parseInt(document.getElementById('commissionSlider').value);
+            let services      = parseInt(document.getElementById('servicesSlider').value);
+
+            let total = subscriptions + commissions + services;
             if (total !== 100) {
-                // Auto-adjust to maintain 100%
-                const diff = 100 - total;
-                const newServices = Math.max(0, services + diff);
-                document.getElementById('servicesSlider').value = newServices;
-                document.getElementById('servicesPercent').textContent = newServices + '%';
+                // Normalize values proportionally so that the sum equals 100
+                const factor = 100 / total;
+                subscriptions = Math.round(subscriptions * factor);
+                commissions   = Math.round(commissions * factor);
+                services      = 100 - subscriptions - commissions;
+                document.getElementById('subscriptionSlider').value = subscriptions;
+                document.getElementById('commissionSlider').value   = commissions;
+                document.getElementById('servicesSlider').value     = services;
             }
-            
+
             document.getElementById('subscriptionPercent').textContent = subscriptions + '%';
-            document.getElementById('commissionPercent').textContent = commissions + '%';
-            document.getElementById('servicesPercent').textContent = document.getElementById('servicesSlider').value + '%';
-            
+            document.getElementById('commissionPercent').textContent   = commissions + '%';
+            document.getElementById('servicesPercent').textContent     = services + '%';
+
             financialData.revenueBreakdown = {
                 subscriptions: subscriptions,
                 commissions: commissions,
-                services: parseInt(document.getElementById('servicesSlider').value)
+                services: services
             };
-            
+
             saveData();
         }
 
