@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORDR - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px 30px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .auth-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .auth-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-toggle a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3c3;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 8px 12px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* RTL Support */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="rtl"] .auth-toggle {
+            text-align: center;
+        }
+
+        [dir="rtl"] .language-switcher {
+            right: auto;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="language-switcher">
+            <button class="lang-btn active" onclick="switchLanguage('en')">English</button>
+            <button class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+        </div>
+
+        <div class="auth-header">
+            <h1 data-lang-en="CORDR" data-lang-ar="كوردر">CORDR</h1>
+            <p data-lang-en="Financial Planning Platform" data-lang-ar="منصة التخطيط المالي">Financial Planning Platform</p>
+        </div>
+
+        <div class="auth-form">
+            <div id="error-message" class="error-message hidden"></div>
+            <div id="success-message" class="success-message hidden"></div>
+
+            <!-- Login Form -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label data-lang-en="Email Address" data-lang-ar="عنوان البريد الإلكتروني">Email Address</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label data-lang-en="Password" data-lang-ar="كلمة المرور">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="auth-button">
+                    <span class="button-text" data-lang-en="Sign In" data-lang-ar="تسجيل الدخول">Sign In</span>
+                    <span class="loading hidden"></span>
+                </button>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="register-form" class="hidden">
+                <div class="form-group">
+                    <label data-lang-en="Full Name" data-lang-ar="الاسم الكامل">Full Name</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label data-lang-en="Email Address" data-lang-ar="عنوان البريد الإلكتروني">Email Address</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label data-lang-en="Password" data-lang-ar="كلمة المرور">Password</label>
+                    <input type="password" id="register-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label data-lang-en="Confirm Password" data-lang-ar="تأكيد كلمة المرور">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" required minlength="6">
+                </div>
+                <button type="submit" class="auth-button">
+                    <span class="button-text" data-lang-en="Create Account" data-lang-ar="إنشاء حساب">Create Account</span>
+                    <span class="loading hidden"></span>
+                </button>
+            </form>
+
+            <div class="auth-toggle">
+                <span id="toggle-text" data-lang-en="Don't have an account?" data-lang-ar="ليس لديك حساب؟">Don't have an account?</span>
+                <a href="#" id="toggle-link" data-lang-en="Sign up" data-lang-ar="سجل الآن">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from './firebase-config.js';
+
+        let currentLang = 'en';
+        let isLoginMode = true;
+
+        // Language switching
+        window.switchLanguage = function(lang) {
+            currentLang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update all text elements
+            document.querySelectorAll('[data-lang-en]').forEach(element => {
+                const text = element.getAttribute(`data-lang-${lang}`);
+                if (text) {
+                    if (element.tagName === 'INPUT') {
+                        element.placeholder = text;
+                    } else {
+                        element.textContent = text;
+                    }
+                }
+            });
+        };
+
+        // Toggle between login and registration
+        document.getElementById('toggle-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleLink = document.getElementById('toggle-link');
+            
+            if (isLoginMode) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                toggleText.setAttribute('data-lang-en', "Don't have an account?");
+                toggleText.setAttribute('data-lang-ar', "ليس لديك حساب؟");
+                toggleLink.setAttribute('data-lang-en', "Sign up");
+                toggleLink.setAttribute('data-lang-ar', "سجل الآن");
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                toggleText.setAttribute('data-lang-en', "Already have an account?");
+                toggleText.setAttribute('data-lang-ar', "لديك حساب بالفعل؟");
+                toggleLink.setAttribute('data-lang-en', "Sign in");
+                toggleLink.setAttribute('data-lang-ar', "سجل الدخول");
+            }
+            
+            // Update text based on current language
+            switchLanguage(currentLang);
+            clearMessages();
+        });
+
+        // Show/hide messages
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.classList.remove('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        function clearMessages() {
+            document.getElementById('error-message').classList.add('hidden');
+            document.getElementById('success-message').classList.add('hidden');
+        }
+
+        // Show/hide loading state
+        function setLoading(form, isLoading) {
+            const button = form.querySelector('.auth-button');
+            const buttonText = button.querySelector('.button-text');
+            const loading = button.querySelector('.loading');
+            
+            if (isLoading) {
+                buttonText.classList.add('hidden');
+                loading.classList.remove('hidden');
+                button.disabled = true;
+            } else {
+                buttonText.classList.remove('hidden');
+                loading.classList.add('hidden');
+                button.disabled = false;
+            }
+        }
+
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearMessages();
+            setLoading(this, true);
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                showSuccess(currentLang === 'en' ? 'Login successful! Redirecting...' : 'تم تسجيل الدخول بنجاح! جاري التحويل...');
+                
+                // Redirect to main presentation after 1 second
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                let errorMessage = currentLang === 'en' ? 'Login failed. Please check your credentials.' : 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.';
+                
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = currentLang === 'en' ? 'No account found with this email.' : 'لا يوجد حساب بهذا البريد الإلكتروني.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = currentLang === 'en' ? 'Incorrect password.' : 'كلمة مرور خاطئة.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = currentLang === 'en' ? 'Invalid email address.' : 'عنوان بريد إلكتروني غير صحيح.';
+                }
+                
+                showError(errorMessage);
+            } finally {
+                setLoading(this, false);
+            }
+        });
+
+        // Registration form submission
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearMessages();
+            setLoading(this, true);
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showError(currentLang === 'en' ? 'Passwords do not match.' : 'كلمات المرور غير متطابقة.');
+                setLoading(this, false);
+                return;
+            }
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                // You can save additional user info to database here if needed
+                // await saveUserProfile(userCredential.user.uid, { name, email });
+                
+                showSuccess(currentLang === 'en' ? 'Account created successfully! Redirecting...' : 'تم إنشاء الحساب بنجاح! جاري التحويل...');
+                
+                // Redirect to main presentation after 1 second
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                let errorMessage = currentLang === 'en' ? 'Registration failed. Please try again.' : 'فشل التسجيل. يرجى المحاولة مرة أخرى.';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = currentLang === 'en' ? 'An account with this email already exists.' : 'يوجد حساب بهذا البريد الإلكتروني بالفعل.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = currentLang === 'en' ? 'Password should be at least 6 characters.' : 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = currentLang === 'en' ? 'Invalid email address.' : 'عنوان بريد إلكتروني غير صحيح.';
+                }
+                
+                showError(errorMessage);
+            } finally {
+                setLoading(this, false);
+            }
+        });
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect to main presentation
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Initialize language
+        switchLanguage('en');
+    </script>
+</body>
+</html>
+

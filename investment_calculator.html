@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="CORDR Investment Opportunity Calculator" data-lang-ar="حاسبة فرصة الاستثمار لكوردر">CORDR Investment Opportunity Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <script src="shared_data.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; direction: ltr; }
+        body.ar { font-family: 'Tajawal', sans-serif; direction: rtl; }
+        .back-btn { position: fixed; top: 20px; left: 20px; z-index: 1000; background-color: #003366; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        body.ar .back-btn { left: auto; right: 20px; }
+        .back-btn:hover { background-color: #004080; transform: translateY(-2px); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 80px 20px 20px; }
+        .card { background-color: #ffffff; border-radius: 15px; padding: 30px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
+        h1 { color: #003366; font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
+        h2 { color: #003366; font-size: 1.8rem; font-weight: 600; margin-bottom: 1.5rem; }
+        h3 { color: #1e40af; font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; }
+        .input-field { border: 2px solid #e2e8f0; border-radius: 8px; padding: 10px 15px; font-size: 16px; transition: all 0.3s ease; }
+        .input-field:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; }
+        .btn-primary { background-color: #3b82f6; color: white; }
+        .btn-primary:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
+        body.ar .lang-switcher { right: auto; left: 20px; }
+        .lang-btn { background-color: #e0e7ff; color: #3f51b5; border: 1px solid #3f51b5; padding: 8px 16px; cursor: pointer; border-radius: 6px; font-weight: 500; }
+        .lang-btn.active { background-color: #3f51b5; color: white; }
+        .editable-field { background-color: #f0f9ff; border: 2px dashed #3b82f6; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: inline-block; min-width: 80px; }
+        .editable-field:hover { background-color: #e0f2fe; }
+        .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+        .metric-label { font-size: 0.9rem; opacity: 0.9; }
+        .chart-container { height: 400px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; font-weight: 600; color: #374151; }
+        .optional-item { background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .expansion-plan { background-color: #d1fae5; border-left: 4px solid #10b981; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left mr-2"></i>
+        <span data-lang-en="Back to Main Presentation" data-lang-ar="العودة للعرض الرئيسي">Back to Main Presentation</span>
+    </a>
+
+    <div class="lang-switcher">
+        <button id="lang-en" class="lang-btn active" onclick="switchLanguage('en')">English</button>
+        <button id="lang-ar" class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+    </div>
+
+    <div class="container">
+        <h1 data-lang-en="CORDR Investment Opportunity Calculator" data-lang-ar="حاسبة فرصة الاستثمار لكوردر">CORDR Investment Opportunity Calculator</h1>
+
+        <!-- Currency Settings -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-6">
+                <h2 data-lang-en="Investment Settings" data-lang-ar="إعدادات الاستثمار">Investment Settings</h2>
+                <div class="flex gap-4 items-center">
+                    <label class="font-semibold" data-lang-en="Currency:" data-lang-ar="العملة:">Currency:</label>
+                    <select id="currency" class="input-field" onchange="updateCurrency()">
+                        <option value="USD">US Dollar (USD)</option>
+                        <option value="SAR">Saudi Riyal (SAR)</option>
+                    </select>
+                    <span id="exchangeRate" class="text-sm text-gray-600">1 USD = 3.75 SAR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Overview -->
+        <div class="card">
+            <h2 data-lang-en="Investment Overview" data-lang-ar="نظرة عامة على الاستثمار">Investment Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="metric-card">
+                    <div class="metric-value" id="fundingDisplay">$3.5M</div>
+                    <div class="metric-label" data-lang-en="Funding Required" data-lang-ar="التمويل المطلوب">Funding Required</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="valuationDisplay">$15.0M</div>
+                    <div class="metric-label" data-lang-en="Proposed Valuation" data-lang-ar="التقييم المقترح">Proposed Valuation</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="equityDisplay">23.3%</div>
+                    <div class="metric-label" data-lang-en="Equity Offered" data-lang-ar="نسبة الملكية المعروضة">Equity Offered</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="roiDisplay">380%</div>
+                    <div class="metric-label" data-lang-en="5-Year ROI" data-lang-ar="العائد لخمس سنوات">5-Year ROI</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Details -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card">
+                <h2 data-lang-en="Investment Details" data-lang-ar="تفاصيل الاستثمار">Investment Details</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <h3 class="text-blue-600 mb-4">
+                            <i class="fas fa-money-bill-wave mr-2"></i>
+                            <span data-lang-en="Funding Required" data-lang-ar="التمويل المطلوب">Funding Required</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="Current Stage:" data-lang-ar="المرحلة الحالية:">Current Stage:</span>
+                                <span class="editable-field" onclick="editField(this, 'stage')" data-lang-en="Seed Round" data-lang-ar="جولة البذور">Seed Round</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="Amount:" data-lang-ar="المبلغ:">Amount:</span>
+                                <input type="number" id="fundingRequired" class="input-field w-32" value="3.5" step="0.1" onchange="updateCalculations()">
+                                <span data-lang-en="Million" data-lang-ar="مليون">Million</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="Proposed Valuation:" data-lang-ar="التقييم المقترح:">Proposed Valuation:</span>
+                                <input type="number" id="proposedValuation" class="input-field w-32" value="15" step="0.1" onchange="updateCalculations()">
+                                <span data-lang-en="Million" data-lang-ar="مليون">Million</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="Equity Offered:" data-lang-ar="نسبة الملكية المعروضة:">Equity Offered:</span>
+                                <span class="editable-field" id="equityOffered" onclick="editEquity()">23.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <h3 class="text-green-600 mb-4">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            <span data-lang-en="Expected Returns" data-lang-ar="العوائد المتوقعة">Expected Returns</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="ROI (5 years):" data-lang-ar="العائد على الاستثمار (5 سنوات):">ROI (5 years):</span>
+                                <input type="number" id="roi" class="input-field w-24" value="380" onchange="saveData()">%
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="IRR:" data-lang-ar="معدل العائد الداخلي:">IRR:</span>
+                                <input type="number" id="irr" class="input-field w-24" value="36.8" step="0.1" onchange="saveData()">%
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span data-lang-en="Payback Period:" data-lang-ar="فترة الاسترداد:">Payback Period:</span>
+                                <input type="number" id="paybackPeriod" class="input-field w-24" value="2.7" step="0.1" onchange="saveData()">
+                                <span data-lang-en="Years" data-lang-ar="سنة">Years</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-6 rounded-lg">
+                        <h3 class="text-purple-600 mb-4">
+                            <i class="fas fa-sign-out-alt mr-2"></i>
+                            <span data-lang-en="Exit Strategy" data-lang-ar="استراتيجية الخروج">Exit Strategy</span>
+                        </h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-purple-600 mr-2"></i>
+                                <span data-lang-en="Acquisition by global company" data-lang-ar="الاستحواذ من قبل شركة عالمية">Acquisition by global company</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-purple-600 mr-2"></i>
+                                <span data-lang-en="Merger with regional platform" data-lang-ar="الاندماج مع منصة إقليمية">Merger with regional platform</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-purple-600 mr-2"></i>
+                                <span data-lang-en="Initial Public Offering (IPO)" data-lang-ar="الطرح العام الأولي">Initial Public Offering (IPO)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 data-lang-en="Investment Value Projection" data-lang-ar="توقعات قيمة الاستثمار">Investment Value Projection</h3>
+                <div class="chart-container">
+                    <canvas id="roiChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Funding Stages -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 data-lang-en="Future Funding Stages" data-lang-ar="مراحل التمويل المستقبلية">Future Funding Stages</h2>
+                <button class="btn btn-success" onclick="addFundingStage()">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-lang-en="Add Stage" data-lang-ar="إضافة مرحلة">Add Stage</span>
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="fundingStagesTable">
+                    <thead>
+                        <tr>
+                            <th data-lang-en="Stage" data-lang-ar="المرحلة">Stage</th>
+                            <th data-lang-en="Amount (Million)" data-lang-ar="المبلغ (مليون)">Amount (Million)</th>
+                            <th data-lang-en="Valuation (Million)" data-lang-ar="التقييم (مليون)">Valuation (Million)</th>
+                            <th data-lang-en="Goal" data-lang-ar="الهدف">Goal</th>
+                            <th data-lang-en="Actions" data-lang-ar="الإجراءات">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="font-bold text-blue-600">
+                                <span class="editable-field" onclick="editField(this, 'stage')" data-lang-en="Current" data-lang-ar="الحالية">Current</span>
+                            </td>
+                            <td><input type="number" class="input-field w-24" value="3.5" onchange="saveData()"></td>
+                            <td><input type="number" class="input-field w-24" value="15" onchange="saveData()"></td>
+                            <td><span class="editable-field" onclick="editField(this, 'goal')" data-lang-en="Launch in Saudi Arabia" data-lang-ar="إطلاق في السعودية">Launch in Saudi Arabia</span></td>
+                            <td><button class="btn btn-danger btn-sm" onclick="removeStage(this)">×</button></td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-green-600">
+                                <span class="editable-field" onclick="editField(this, 'stage')" data-lang-en="Series A" data-lang-ar="جولة A">Series A</span>
+                            </td>
+                            <td><input type="number" class="input-field w-24" value="15" onchange="saveData()"></td>
+                            <td><input type="number" class="input-field w-24" value="75" onchange="saveData()"></td>
+                            <td><span class="editable-field" onclick="editField(this, 'goal')" data-lang-en="Expansion in GCC" data-lang-ar="التوسع في الخليج">Expansion in GCC</span></td>
+                            <td><button class="btn btn-danger btn-sm" onclick="removeStage(this)">×</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Optional Investment Items -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 data-lang-en="Optional Investment Items" data-lang-ar="بنود استثمارية اختيارية">Optional Investment Items</h2>
+                <button class="btn btn-success" onclick="addOptionalItem()">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-lang-en="Add Item" data-lang-ar="إضافة بند">Add Item</span>
+                </button>
+            </div>
+            <div id="optionalItems">
+                <div class="optional-item">
+                    <div class="flex justify-between items-center">
+                        <span class="editable-field" onclick="editField(this, 'item')" data-lang-en="Technology Infrastructure Enhancement" data-lang-ar="تطوير البنية التقنية">Technology Infrastructure Enhancement</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" class="input-field w-24" value="1.2" step="0.1" onchange="saveData()">
+                            <span data-lang-en="Million" data-lang-ar="مليون">Million</span>
+                            <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="optional-item">
+                    <div class="flex justify-between items-center">
+                        <span class="editable-field" onclick="editField(this, 'item')" data-lang-en="Marketing & Customer Acquisition" data-lang-ar="التسويق واكتساب العملاء">Marketing & Customer Acquisition</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" class="input-field w-24" value="0.8" step="0.1" onchange="saveData()">
+                            <span data-lang-en="Million" data-lang-ar="مليون">Million</span>
+                            <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expansion Plans -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 data-lang-en="Expansion Plans" data-lang-ar="خطط التوسع">Expansion Plans</h2>
+                <button class="btn btn-success" onclick="addExpansionPlan()">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-lang-en="Add Plan" data-lang-ar="إضافة خطة">Add Plan</span>
+                </button>
+            </div>
+            <div id="expansionPlans">
+                <div class="expansion-plan">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <strong><span class="editable-field" onclick="editField(this, 'phase')" data-lang-en="Phase 1 (Year 1-2):" data-lang-ar="المرحلة الأولى (السنة 1-2):">Phase 1 (Year 1-2):</span></strong>
+                            <span class="editable-field ml-2" onclick="editField(this, 'description')" data-lang-en="Launch in Riyadh, Jeddah, and Dammam" data-lang-ar="الإطلاق في الرياض وجدة والدمام">Launch in Riyadh, Jeddah, and Dammam</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                    </div>
+                </div>
+                <div class="expansion-plan">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <strong><span class="editable-field" onclick="editField(this, 'phase')" data-lang-en="Phase 2 (Year 2-3):" data-lang-ar="المرحلة الثانية (السنة 2-3):">Phase 2 (Year 2-3):</span></strong>
+                            <span class="editable-field ml-2" onclick="editField(this, 'description')" data-lang-en="Expand to UAE, Kuwait, and Bahrain" data-lang-ar="التوسع إلى الإمارات والكويت والبحرين">Expand to UAE, Kuwait, and Bahrain</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                    </div>
+                </div>
+                <div class="expansion-plan">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <strong><span class="editable-field" onclick="editField(this, 'phase')" data-lang-en="Phase 3 (Year 3-5):" data-lang-ar="المرحلة الثالثة (السنة 3-5):">Phase 3 (Year 3-5):</span></strong>
+                            <span class="editable-field ml-2" onclick="editField(this, 'description')" data-lang-en="Regional expansion to Qatar, Oman, and Jordan" data-lang-ar="التوسع الإقليمي إلى قطر وعمان والأردن">Regional expansion to Qatar, Oman, and Jordan</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Expansion Strategy -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 data-lang-en="Interactive Expansion Strategy" data-lang-ar="استراتيجية التوسع التفاعلية">Interactive Expansion Strategy</h2>
+                <button class="btn btn-success" onclick="showAddExpansionPhaseForm()">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-lang-en="Add Expansion Phase" data-lang-ar="إضافة مرحلة توسع">Add Expansion Phase</span>
+                </button>
+            </div>
+
+            <!-- Add Expansion Phase Form (Hidden by default) -->
+            <div id="addExpansionPhaseForm" class="bg-gray-50 p-4 rounded-lg mb-4" style="display: none;">
+                <h3 class="text-lg font-bold mb-3" data-lang-en="Add New Expansion Phase" data-lang-ar="إضافة مرحلة توسع جديدة">Add New Expansion Phase</h3>
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <input type="text" id="newExpansionPhaseName" placeholder="Phase Name" class="input-field">
+                    <input type="text" id="newExpansionPhaseRegion" placeholder="Region/Countries" class="input-field">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <input type="text" id="newExpansionPhaseTimeline" placeholder="Timeline (e.g., Year 1)" class="input-field">
+                    <input type="number" id="newExpansionPhaseCost" placeholder="Investment Cost (Million)" min="0" step="0.1" class="input-field">
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <input type="number" id="newExpansionPhaseCompanies" placeholder="Target Companies" min="0" class="input-field">
+                    <input type="number" id="newExpansionPhaseDrivers" placeholder="Target Drivers" min="0" class="input-field">
+                </div>
+                <textarea id="newExpansionPhaseDescription" placeholder="Phase Description" class="input-field w-full mb-3" rows="3"></textarea>
+                <div class="flex gap-2">
+                    <button class="btn btn-primary" onclick="addDetailedExpansionPhase()">
+                        <span data-lang-en="Add Phase" data-lang-ar="إضافة مرحلة">Add Phase</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="hideAddExpansionPhaseForm()">
+                        <span data-lang-en="Cancel" data-lang-ar="إلغاء">Cancel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Expansion Phases List -->
+            <div id="detailedExpansionPhasesList" class="space-y-4 max-h-96 overflow-y-auto mb-6">
+                <!-- Default phases will be rendered here -->
+            </div>
+
+            <!-- Investment Summary -->
+            <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                <h3 class="text-lg font-bold text-blue-600 mb-3" data-lang-en="Expansion Investment Summary" data-lang-ar="ملخص استثمار التوسع">Expansion Investment Summary</h3>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-green-600" id="totalExpansionInvestment">$0M</div>
+                        <p class="text-sm" data-lang-en="Total Investment" data-lang-ar="إجمالي الاستثمار">Total Investment</p>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-green-600" id="totalTargetCompanies">0</div>
+                        <p class="text-sm" data-lang-en="Target Companies" data-lang-ar="الشركات المستهدفة">Target Companies</p>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-green-600" id="totalTargetDrivers">0</div>
+                        <p class="text-sm" data-lang-en="Target Drivers" data-lang-ar="السائقون المستهدفون">Target Drivers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expansion Chart -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold mb-3" data-lang-en="Expansion Investment vs Target Companies" data-lang-ar="استثمار التوسع مقابل الشركات المستهدفة">Expansion Investment vs Target Companies</h3>
+                <div class="chart-container">
+                    <canvas id="expansionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Expansion Strategy Components -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-lg font-bold text-green-600 mb-2">
+                        <i class="fas fa-handshake mr-2"></i>
+                        <span data-lang-en="Partnerships" data-lang-ar="الشراكات">Partnerships</span>
+                    </h4>
+                    <p class="text-sm" data-lang-en="Local transportation authorities and ride-hailing companies" data-lang-ar="السلطات المحلية للنقل وشركات النقل التشاركي">Local transportation authorities and ride-hailing companies</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-lg font-bold text-green-600 mb-2">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        <span data-lang-en="Local Teams" data-lang-ar="الفرق المحلية">Local Teams</span>
+                    </h4>
+                    <p class="text-sm" data-lang-en="Hire teams with market knowledge and regulatory expertise" data-lang-ar="توظيف فرق لديها معرفة بالسوق والخبرة التنظيمية">Hire teams with market knowledge and regulatory expertise</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-lg font-bold text-green-600 mb-2">
+                        <i class="fas fa-cogs mr-2"></i>
+                        <span data-lang-en="Localization" data-lang-ar="التوطين">Localization</span>
+                    </h4>
+                    <p class="text-sm" data-lang-en="Adapt platform to local languages and payment methods" data-lang-ar="تكييف المنصة مع اللغات المحلية وطرق الدفع">Adapt platform to local languages and payment methods</p>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="text-lg font-bold text-green-600 mb-2">
+                        <i class="fas fa-chart-line mr-2"></i>
+                        <span data-lang-en="Data-Driven" data-lang-ar="مدفوع بالبيانات">Data-Driven</span>
+                    </h4>
+                    <p class="text-sm" data-lang-en="Use market data to prioritize expansion targets" data-lang-ar="استخدام بيانات السوق لتحديد أولويات أهداف التوسع">Use market data to prioritize expansion targets</p>
+                </div>
+            </div>
+
+            <!-- Success Metrics by Phase -->
+            <div class="bg-green-50 p-4 rounded-lg">
+                <h3 class="text-lg font-bold text-green-600 mb-3" data-lang-en="Success Metrics by Phase" data-lang-ar="مقاييس النجاح حسب المرحلة">Success Metrics by Phase</h3>
+                <div id="expansionPhaseMetrics" class="text-sm">
+                    <!-- Phase metrics will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        let currentCurrency = 'USD';
+        const exchangeRate = 3.75;
+        let roiChart;
+        let expansionChart;
+        let manualEquityOverride = false;
+        
+        // Investment data
+        let investmentData = {
+            fundingRequired: 3.5,
+            proposedValuation: 15,
+            roi: 380,
+            irr: 36.8,
+            paybackPeriod: 2.7,
+            chartData: [3.5, 4.2, 7.0, 10.5, 15.8, 16.8]
+        };
+
+        // Expansion phases data
+        let expansionPhases = [
+            {
+                id: 1,
+                name: "Saudi Arabia Launch",
+                region: "Saudi Arabia (Riyadh, Jeddah, Dammam)",
+                timeline: "Year 1",
+                cost: 5.2,
+                companies: 25,
+                drivers: 10000,
+                description: "Launch in major Saudi cities with focus on market penetration"
+            },
+            {
+                id: 2,
+                name: "GCC Expansion",
+                region: "UAE, Qatar, Kuwait, Bahrain, Oman",
+                timeline: "Year 2",
+                cost: 12.8,
+                companies: 75,
+                drivers: 40000,
+                description: "Expand to GCC countries leveraging Saudi success"
+            },
+            {
+                id: 3,
+                name: "MENA Region",
+                region: "Egypt, Jordan, Morocco, Tunisia, Turkey, Lebanon",
+                timeline: "Year 3",
+                cost: 25.5,
+                companies: 150,
+                drivers: 150000,
+                description: "Enter broader MENA market with localized approach"
+            },
+            {
+                id: 4,
+                name: "Global Markets",
+                region: "Southeast Asia, South Asia, Africa",
+                timeline: "Year 4+",
+                cost: 45.0,
+                companies: 300,
+                drivers: 500000,
+                description: "Global expansion to high-growth emerging markets"
+            }
+        ];
+
+        let nextExpansionPhaseId = 5;
+
+        // Language switching
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.body.className = lang === 'ar' ? 'ar' : '';
+            
+            document.querySelectorAll('[data-lang-en]').forEach(el => {
+                const translation = el.getAttribute(`data-lang-${lang}`);
+                if (translation) {
+                    el.textContent = translation;
+                }
+            });
+            
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
+            
+            updateChart();
+            createExpansionChart();
+        }
+
+        // Expansion Strategy Functions
+        function showAddExpansionPhaseForm() {
+            document.getElementById('addExpansionPhaseForm').style.display = 'block';
+        }
+
+        function hideAddExpansionPhaseForm() {
+            document.getElementById('addExpansionPhaseForm').style.display = 'none';
+            clearAddExpansionPhaseForm();
+        }
+
+        function clearAddExpansionPhaseForm() {
+            document.getElementById('newExpansionPhaseName').value = '';
+            document.getElementById('newExpansionPhaseRegion').value = '';
+            document.getElementById('newExpansionPhaseTimeline').value = '';
+            document.getElementById('newExpansionPhaseCost').value = '';
+            document.getElementById('newExpansionPhaseCompanies').value = '';
+            document.getElementById('newExpansionPhaseDrivers').value = '';
+            document.getElementById('newExpansionPhaseDescription').value = '';
+        }
+
+        function addDetailedExpansionPhase() {
+            const name = document.getElementById('newExpansionPhaseName').value;
+            const region = document.getElementById('newExpansionPhaseRegion').value;
+            const timeline = document.getElementById('newExpansionPhaseTimeline').value;
+            const cost = parseFloat(document.getElementById('newExpansionPhaseCost').value);
+            const companies = parseInt(document.getElementById('newExpansionPhaseCompanies').value);
+            const drivers = parseInt(document.getElementById('newExpansionPhaseDrivers').value);
+            const description = document.getElementById('newExpansionPhaseDescription').value;
+
+            if (name && region && timeline && !isNaN(cost) && !isNaN(companies) && !isNaN(drivers)) {
+                expansionPhases.push({
+                    id: nextExpansionPhaseId++,
+                    name,
+                    region,
+                    timeline,
+                    cost,
+                    companies,
+                    drivers,
+                    description
+                });
+
+                hideAddExpansionPhaseForm();
+                renderDetailedExpansionPhases();
+                updateExpansionTotals();
+                createExpansionChart();
+                saveData();
+            } else {
+                alert(currentLang === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة ببيانات صحيحة.' : 'Please fill in all required fields with valid data.');
+            }
+        }
+
+        function editExpansionPhase(id) {
+            const phase = expansionPhases.find(p => p.id === id);
+            if (!phase) return;
+
+            const newName = prompt(currentLang === 'ar' ? 'اسم المرحلة:' : 'Phase Name:', phase.name);
+            if (newName === null) return;
+
+            const newRegion = prompt(currentLang === 'ar' ? 'المنطقة/البلدان:' : 'Region/Countries:', phase.region);
+            if (newRegion === null) return;
+
+            const newTimeline = prompt(currentLang === 'ar' ? 'الجدول الزمني:' : 'Timeline:', phase.timeline);
+            if (newTimeline === null) return;
+
+            const newCost = prompt(currentLang === 'ar' ? 'تكلفة الاستثمار (بالمليون):' : 'Investment Cost (millions):', phase.cost);
+            if (newCost === null || isNaN(newCost)) return;
+
+            const newCompanies = prompt(currentLang === 'ar' ? 'الشركات المستهدفة:' : 'Target Companies:', phase.companies);
+            if (newCompanies === null || isNaN(newCompanies)) return;
+
+            const newDrivers = prompt(currentLang === 'ar' ? 'السائقون المستهدفون:' : 'Target Drivers:', phase.drivers);
+            if (newDrivers === null || isNaN(newDrivers)) return;
+
+            const newDescription = prompt(currentLang === 'ar' ? 'الوصف:' : 'Description:', phase.description);
+            if (newDescription === null) return;
+
+            phase.name = newName;
+            phase.region = newRegion;
+            phase.timeline = newTimeline;
+            phase.cost = parseFloat(newCost);
+            phase.companies = parseInt(newCompanies);
+            phase.drivers = parseInt(newDrivers);
+            phase.description = newDescription;
+
+            renderDetailedExpansionPhases();
+            updateExpansionTotals();
+            createExpansionChart();
+            saveData();
+        }
+
+        function removeExpansionPhase(id) {
+            const confirmText = currentLang === 'ar' ? 'هل أنت متأكد من حذف مرحلة التوسع هذه؟' : 'Are you sure you want to remove this expansion phase?';
+            if (confirm(confirmText)) {
+                expansionPhases = expansionPhases.filter(p => p.id !== id);
+                renderDetailedExpansionPhases();
+                updateExpansionTotals();
+                createExpansionChart();
+                saveData();
+            }
+        }
+
+        function renderDetailedExpansionPhases() {
+            const container = document.getElementById('detailedExpansionPhasesList');
+            container.innerHTML = '';
+
+            expansionPhases.forEach((phase, index) => {
+                const phaseDiv = document.createElement('div');
+                phaseDiv.className = 'bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow';
+                
+                const displayCost = currentCurrency === 'USD' ? phase.cost : phase.cost * exchangeRate;
+                const currencySymbol = currentCurrency === 'USD' ? '$' : 'SAR ';
+                const costSuffix = 'M';
+
+                phaseDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center">
+                            <div class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm font-bold">${index + 1}</div>
+                            <h4 class="text-lg font-bold text-gray-800">${phase.name}</h4>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="editExpansionPhase(${phase.id})">
+                                <i class="fas fa-edit mr-1"></i>
+                                <span data-lang-en="Edit" data-lang-ar="تعديل">Edit</span>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="removeExpansionPhase(${phase.id})">
+                                <i class="fas fa-trash mr-1"></i>
+                                <span data-lang-en="Remove" data-lang-ar="حذف">Remove</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <p class="text-sm text-gray-600"><strong data-lang-en="Region:" data-lang-ar="المنطقة:">Region:</strong> ${phase.region}</p>
+                        <p class="text-sm text-gray-600"><strong data-lang-en="Timeline:" data-lang-ar="الجدول الزمني:">Timeline:</strong> ${phase.timeline}</p>
+                        <p class="text-sm text-gray-600"><strong data-lang-en="Investment:" data-lang-ar="الاستثمار:">Investment:</strong> ${currencySymbol}${displayCost.toFixed(1)}${costSuffix}</p>
+                        <p class="text-sm text-gray-600"><strong data-lang-en="Targets:" data-lang-ar="الأهداف:">Targets:</strong> ${phase.companies} companies, ${phase.drivers.toLocaleString()} drivers</p>
+                    </div>
+                    <p class="text-sm text-gray-700">${phase.description}</p>
+                `;
+                
+                container.appendChild(phaseDiv);
+            });
+
+            // Update phase metrics
+            updateExpansionPhaseMetrics();
+        }
+
+        function updateExpansionTotals() {
+            const totalCost = expansionPhases.reduce((sum, phase) => sum + phase.cost, 0);
+            const totalCompanies = expansionPhases.reduce((sum, phase) => sum + phase.companies, 0);
+            const totalDrivers = expansionPhases.reduce((sum, phase) => sum + phase.drivers, 0);
+
+            const displayCost = currentCurrency === 'USD' ? totalCost : totalCost * exchangeRate;
+            const currencySymbol = currentCurrency === 'USD' ? '$' : 'SAR ';
+
+            document.getElementById('totalExpansionInvestment').textContent = `${currencySymbol}${displayCost.toFixed(1)}M`;
+            document.getElementById('totalTargetCompanies').textContent = totalCompanies.toLocaleString();
+            document.getElementById('totalTargetDrivers').textContent = totalDrivers.toLocaleString();
+        }
+
+        function updateExpansionPhaseMetrics() {
+            const metricsContainer = document.getElementById('expansionPhaseMetrics');
+            metricsContainer.innerHTML = '';
+            
+            expansionPhases.forEach((phase, index) => {
+                const metricDiv = document.createElement('div');
+                metricDiv.className = 'flex justify-between items-center py-2 border-b border-gray-200';
+                metricDiv.innerHTML = `
+                    <span class="font-medium">${phase.name}:</span>
+                    <span class="text-green-600">${phase.companies} companies, ${(phase.drivers/1000).toFixed(0)}K drivers</span>
+                `;
+                metricsContainer.appendChild(metricDiv);
+            });
+        }
+
+        function createExpansionChart() {
+            const ctx = document.getElementById('expansionChart').getContext('2d');
+            
+            // Clear existing chart
+            if (expansionChart) {
+                expansionChart.destroy();
+            }
+
+            const labels = expansionPhases.map(phase => phase.name);
+            const costs = expansionPhases.map(phase => currentCurrency === 'USD' ? phase.cost : phase.cost * exchangeRate);
+            const companies = expansionPhases.map(phase => phase.companies);
+
+            expansionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: currentLang === 'ar' ? `تكلفة الاستثمار (${currentCurrency === 'USD' ? '$M' : 'SAR M'})` : `Investment Cost (${currentCurrency === 'USD' ? '$M' : 'SAR M'})`,
+                            data: costs,
+                            backgroundColor: 'rgba(30, 136, 229, 0.7)',
+                            borderColor: 'rgba(30, 136, 229, 1)',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: currentLang === 'ar' ? 'الشركات المستهدفة' : 'Target Companies',
+                            data: companies,
+                            backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 2,
+                            type: 'line',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: currentLang === 'ar' ? 'تكلفة الاستثمار مقابل الشركات المستهدفة حسب المرحلة' : 'Investment Cost vs Target Companies by Phase',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: currentLang === 'ar' ? `تكلفة الاستثمار (${currentCurrency === 'USD' ? '$M' : 'SAR M'})` : `Investment Cost (${currentCurrency === 'USD' ? '$M' : 'SAR M'})`,
+                                font: { size: 12 }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: currentLang === 'ar' ? 'الشركات المستهدفة' : 'Target Companies',
+                                font: { size: 12 }
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Currency conversion
+        function updateCurrency() {
+            currentCurrency = document.getElementById('currency').value;
+            updateCalculations();
+            updateChart();
+            updateExpansionTotals();
+            createExpansionChart();
+        }
+
+        function formatCurrency(amount) {
+            const symbol = currentCurrency === 'USD' ? '$' : 'SAR ';
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            const converted = amount * rate;
+            const formatted = converted.toFixed(1) + 'M';
+            return currentCurrency === 'USD' ? symbol + formatted : formatted + ' ' + symbol;
+        }
+
+        // Edit field functionality
+        function editField(element, type) {
+            const currentText = element.textContent;
+            const newText = prompt(
+                currentLang === 'ar' ? 'أدخل النص الجديد:' : 'Enter new text:',
+                currentText
+            );
+            if (newText && newText.trim() !== "") {
+                element.textContent = newText.trim();
+                if (currentLang === 'ar') {
+                    element.setAttribute('data-lang-ar', newText.trim());
+                } else {
+                    element.setAttribute('data-lang-en', newText.trim());
+                }
+                saveData();
+            }
+        }
+
+        function editEquity() {
+            const currentText = document.getElementById('equityOffered').textContent.replace('%', '');
+            const newEquity = prompt(
+                currentLang === 'ar' ? 'أدخل نسبة الملكية الجديدة (%):' : 'Enter new equity percentage (%):',
+                currentText
+            );
+            if (newEquity && !isNaN(newEquity)) {
+                document.getElementById('equityOffered').textContent = parseFloat(newEquity).toFixed(1) + '%';
+                manualEquityOverride = true;
+                updateCalculations();
+                saveData();
+            }
+        }
+
+        // Update calculations
+        function updateCalculations() {
+            const fundingRequired = parseFloat(document.getElementById('fundingRequired').value);
+            const proposedValuation = parseFloat(document.getElementById('proposedValuation').value);
+            
+            investmentData.fundingRequired = fundingRequired;
+            investmentData.proposedValuation = proposedValuation;
+            
+            // Update displays
+            document.getElementById('fundingDisplay').textContent = formatCurrency(fundingRequired);
+            document.getElementById('valuationDisplay').textContent = formatCurrency(proposedValuation);
+            document.getElementById('roiDisplay').textContent = document.getElementById('roi').value + '%';
+            
+            // Calculate equity if not manually overridden
+            if (!manualEquityOverride && proposedValuation > 0) {
+                const equity = (fundingRequired / proposedValuation) * 100;
+                document.getElementById('equityOffered').textContent = equity.toFixed(1) + '%';
+                document.getElementById('equityDisplay').textContent = equity.toFixed(1) + '%';
+            } else {
+                document.getElementById('equityDisplay').textContent = document.getElementById('equityOffered').textContent;
+            }
+            
+            saveData();
+        }
+
+        // Chart functionality
+        function createChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            
+            roiChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: currentLang === 'ar' ? 
+                        ['السنة 0', 'السنة 1', 'السنة 2', 'السنة 3', 'السنة 4', 'السنة 5'] :
+                        ['Year 0', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [
+                        {
+                            label: currentLang === 'ar' ? 'قيمة الاستثمار' : 'Investment Value',
+                            data: investmentData.chartData.map(v => v * rate),
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: currentLang === 'ar' ? 'التدفق النقدي التراكمي' : 'Cumulative Cash Flow',
+                            data: [-3.5, -2.8, -0.5, 2.1, 8.4, 13.3].map(v => v * rate),
+                            backgroundColor: 'rgba(30, 136, 229, 0.2)',
+                            borderColor: 'rgba(30, 136, 229, 1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: currentLang === 'ar' ? 'العائد على الاستثمار (قابل للتعديل)' : 'Return on Investment (Editable)',
+                            font: { size: 16 }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: currentCurrency === 'USD' ? 'Million USD' : 'Million SAR'
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const element = elements[0];
+                            const datasetIndex = element.datasetIndex;
+                            const index = element.index;
+                            const year = roiChart.data.labels[index];
+                            const datasetLabel = roiChart.data.datasets[datasetIndex].label;
+                            const value = roiChart.data.datasets[datasetIndex].data[index];
+                            
+                            const promptText = currentLang === 'ar' ? 
+                                `أدخل قيمة جديدة لـ "${year}" (${datasetLabel}):` : 
+                                `Enter new value for "${year}" (${datasetLabel}):`;
+                            const newValue = prompt(promptText, value);
+                            
+                            if (newValue !== null && !isNaN(newValue)) {
+                                roiChart.data.datasets[datasetIndex].data[index] = Number(newValue);
+                                const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+                                if (datasetIndex === 0) {
+                                    investmentData.chartData[index] = Number(newValue) / rate;
+                                }
+                                roiChart.update();
+                                saveData();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (roiChart) {
+                const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+                roiChart.data.datasets[0].data = investmentData.chartData.map(v => v * rate);
+                roiChart.options.scales.y.title.text = currentCurrency === 'USD' ? 'Million USD' : 'Million SAR';
+                roiChart.update();
+            }
+        }
+
+        // Add/Remove functions
+        function addFundingStage() {
+            const stageName = prompt(
+                currentLang === 'ar' ? 'أدخل اسم المرحلة:' : 'Enter stage name:',
+                currentLang === 'ar' ? 'جولة جديدة' : 'New Round'
+            );
+            const stageAmount = prompt(
+                currentLang === 'ar' ? 'أدخل المبلغ (بالمليون):' : 'Enter amount (in millions):',
+                '10'
+            );
+            const stageValuation = prompt(
+                currentLang === 'ar' ? 'أدخل التقييم (بالمليون):' : 'Enter valuation (in millions):',
+                '50'
+            );
+            const stageGoal = prompt(
+                currentLang === 'ar' ? 'أدخل هدف المرحلة:' : 'Enter stage goal:',
+                currentLang === 'ar' ? 'هدف المرحلة' : 'Stage goal'
+            );
+            
+            if (stageName && stageAmount && stageValuation && stageGoal) {
+                const tableBody = document.getElementById('fundingStagesTable').getElementsByTagName('tbody')[0];
+                const newRow = tableBody.insertRow();
+                newRow.innerHTML = `
+                    <td class="font-bold text-purple-600">
+                        <span class="editable-field" onclick="editField(this, 'stage')" data-lang-en="${stageName}" data-lang-ar="${stageName}">${stageName}</span>
+                    </td>
+                    <td><input type="number" class="input-field w-24" value="${stageAmount}" onchange="saveData()"></td>
+                    <td><input type="number" class="input-field w-24" value="${stageValuation}" onchange="saveData()"></td>
+                    <td><span class="editable-field" onclick="editField(this, 'goal')" data-lang-en="${stageGoal}" data-lang-ar="${stageGoal}">${stageGoal}</span></td>
+                    <td><button class="btn btn-danger btn-sm" onclick="removeStage(this)">×</button></td>
+                `;
+                saveData();
+            }
+        }
+
+        function addOptionalItem() {
+            const itemName = prompt(
+                currentLang === 'ar' ? 'أدخل اسم البند الاختياري:' : 'Enter optional item name:',
+                currentLang === 'ar' ? 'بند جديد' : 'New Item'
+            );
+            const itemAmount = prompt(
+                currentLang === 'ar' ? 'أدخل المبلغ (بالمليون):' : 'Enter amount (in millions):',
+                '1.0'
+            );
+            
+            if (itemName && itemAmount && !isNaN(itemAmount)) {
+                const container = document.getElementById('optionalItems');
+                const newItem = document.createElement('div');
+                newItem.className = 'optional-item';
+                newItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="editable-field" onclick="editField(this, 'item')" data-lang-en="${itemName}" data-lang-ar="${itemName}">${itemName}</span>
+                        <div class="flex items-center gap-2">
+                            <input type="number" class="input-field w-24" value="${itemAmount}" step="0.1" onchange="saveData()">
+                            <span data-lang-en="Million" data-lang-ar="مليون">Million</span>
+                            <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newItem);
+                saveData();
+            }
+        }
+
+        function addExpansionPlan() {
+            const planTitle = prompt(
+                currentLang === 'ar' ? 'أدخل عنوان الخطة:' : 'Enter plan title:',
+                currentLang === 'ar' ? 'مرحلة جديدة:' : 'New Phase:'
+            );
+            const planDescription = prompt(
+                currentLang === 'ar' ? 'أدخل وصف الخطة:' : 'Enter plan description:',
+                currentLang === 'ar' ? 'وصف الخطة' : 'Plan description'
+            );
+            
+            if (planTitle && planDescription) {
+                const container = document.getElementById('expansionPlans');
+                const newPlan = document.createElement('div');
+                newPlan.className = 'expansion-plan';
+                newPlan.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <strong><span class="editable-field" onclick="editField(this, 'phase')" data-lang-en="${planTitle}" data-lang-ar="${planTitle}">${planTitle}</span></strong>
+                            <span class="editable-field ml-2" onclick="editField(this, 'description')" data-lang-en="${planDescription}" data-lang-ar="${planDescription}">${planDescription}</span>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="removeItem(this)">×</button>
+                    </div>
+                `;
+                container.appendChild(newPlan);
+                saveData();
+            }
+        }
+
+        function removeStage(button) {
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه المرحلة؟' : 'Are you sure you want to remove this stage?')) {
+                button.closest('tr').remove();
+                saveData();
+            }
+        }
+
+        function removeItem(button) {
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من الحذف؟' : 'Are you sure you want to delete?')) {
+                button.closest('.optional-item, .expansion-plan').remove();
+                saveData();
+            }
+        }
+
+        // Data persistence
+        function saveData() {
+            const data = {
+                investmentData: investmentData,
+                currency: currentCurrency,
+                language: currentLang,
+                manualEquityOverride: manualEquityOverride
+            };
+            localStorage.setItem('cordrInvestmentData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('cordrInvestmentData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                investmentData = data.investmentData || investmentData;
+                currentCurrency = data.currency || 'USD';
+                currentLang = data.language || 'en';
+                manualEquityOverride = data.manualEquityOverride || false;
+                
+                document.getElementById('currency').value = currentCurrency;
+                document.getElementById('fundingRequired').value = investmentData.fundingRequired;
+                document.getElementById('proposedValuation').value = investmentData.proposedValuation;
+                document.getElementById('roi').value = investmentData.roi;
+                document.getElementById('irr').value = investmentData.irr;
+                document.getElementById('paybackPeriod').value = investmentData.paybackPeriod;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            switchLanguage(currentLang);
+            updateCalculations();
+            createChart();
+            renderDetailedExpansionPhases();
+            updateExpansionTotals();
+            createExpansionChart();
+        });
+    </script>
+</body>
+</html>
+

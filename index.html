@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="CORDR Platform - Interactive Presentation" data-lang-ar="منصة كوردر - العرض التفاعلي">CORDR Platform - Interactive Presentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <script type="module">
+        // Import Firebase modules
+        import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+        import './firebase-data.js';
+
+        // Check authentication status
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // User is not signed in, redirect to login
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            // User is signed in, show user info and logout option
+            addUserControls(user);
+        });
+
+        // Add user controls to navbar
+        function addUserControls(user) {
+            const navbar = document.querySelector('.navbar-content');
+
+            // Create user info and logout button
+            const userControls = document.createElement('div');
+            userControls.className = 'user-controls';
+            userControls.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-left: 20px;';
+
+            const userEmail = document.createElement('span');
+            userEmail.textContent = user.email;
+            userEmail.style.cssText = 'font-size: 0.8rem; color: #666;';
+
+            const logoutBtn = document.createElement('button');
+            logoutBtn.textContent = 'Logout';
+            logoutBtn.style.cssText = 'background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; font-size: 0.8rem;';
+            logoutBtn.onclick = async () => {
+                try {
+                    await signOut(auth);
+                    window.location.href = 'auth.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            };
+
+            userControls.appendChild(userEmail);
+            userControls.appendChild(logoutBtn);
+            navbar.appendChild(userControls);
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; direction: ltr; scroll-behavior: smooth; }
+        body.ar { font-family: 'Tajawal', sans-serif; direction: rtl; }
+        .slide { min-height: 100vh; width: 100%; padding: 8rem 4rem 4rem 4rem; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .slide:nth-child(even) { background-color: #f8f9fa; }
+        .slide:nth-child(odd) { background-color: #ffffff; }
+        .slide:last-child { border-bottom: none; }
+        h1, h2, h3 { color: #003366; }
+        h1 { font-size: 3.5rem; line-height: 1.2; font-weight: 700; text-align: center; }
+        h2 { font-size: 2.5rem; font-weight: 600; margin-bottom: 2.5rem; text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 1rem; width:100%; max-width: 800px;}
+        h3 { font-size: 1.5rem; font-weight: 600; color: #1e40af; margin-bottom: 1rem; }
+        .card { background-color: #ffffff; border-radius: 15px; padding: 30px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); width: 100%; max-width: 1400px; }
+        .navbar { background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 1rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 50; flex-wrap: wrap; }
+        .navbar-content { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .navbar a { color: #003366; padding: 0.5rem 0.75rem; margin: 0 0.25rem; border-radius: 0.375rem; transition: all 0.3s ease; white-space: nowrap; font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+        .navbar a:hover, .navbar a.active { background-color: #003366; color: white; }
+        .lang-switcher { display: flex; gap: 0.5rem; margin-left: auto; }
+        body.ar .lang-switcher { margin-left: 0; margin-right: auto; }
+        .lang-btn { background-color: #e0e7ff; color: #3f51b5; border: 1px solid #3f51b5; padding: 0.5rem 1rem; cursor: pointer; border-radius: 0.375rem; }
+        .lang-btn.active { background-color: #3f51b5; color: white; }
+        .logo { height: 40px; width: auto; margin-right: 2rem; }
+        body.ar .logo { margin-right: 0; margin-left: 2rem; }
+        .benefit-card p { word-wrap: break-word; word-break: break-word; }
+        .benefit-card { transition: transform 0.3s ease; }
+
+        /* Navigation Indicator */
+        .nav-indicator { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+        body.ar .nav-indicator { right: auto; left: 20px; }
+        .nav-dot { width: 12px; height: 12px; border-radius: 50%; background-color: rgba(0, 51, 102, 0.3); cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .nav-dot.active { background-color: #003366; transform: scale(1.3); }
+        .nav-dot:hover { background-color: #003366; transform: scale(1.2); }
+        .nav-tooltip { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); background-color: #003366; color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        body.ar .nav-tooltip { right: auto; left: 25px; }
+        .nav-dot:hover .nav-tooltip { opacity: 1; visibility: visible; }
+
+        /* Progress Bar */
+        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background-color: #003366; z-index: 1000; transition: width 0.3s ease; }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <nav class="navbar">
+        <img src="cordr logo.jpg" alt="CORDR Logo" class="logo">
+        <div class="navbar-content">
+            <a href="#intro" data-lang-en="Introduction" data-lang-ar="المقدمة">Introduction</a>
+            <a href="#problem" data-lang-en="Problem" data-lang-ar="المشكلة">Problem</a>
+            <a href="#solution" data-lang-en="Solution" data-lang-ar="الحل">Solution</a>
+            <a href="#benefits" data-lang-en="Benefits" data-lang-ar="الفوائد">Benefits</a>
+            <a href="#market" data-lang-en="Market" data-lang-ar="السوق">Market</a>
+            <a href="#competitive_edge" data-lang-en="Competition" data-lang-ar="المنافسة">Competition</a>
+            <a href="#business_model" data-lang-en="Business Model" data-lang-ar="نموذج العمل">Business Model</a>
+            <a href="team_costs_calculator.html" target="_blank" data-lang-en="Team & Costs" data-lang-ar="الفريق والتكاليف">Team & Costs</a>
+            <a href="#financials" data-lang-en="Financials" data-lang-ar="الماليات">Financials</a>
+            <a href="#investment" data-lang-en="Investment" data-lang-ar="الاستثمار">Investment</a>
+            <a href="#operational_costs" data-lang-en="Operational Costs" data-lang-ar="التكاليف التشغيلية">Operational Costs</a>
+        </div>
+        <div class="lang-switcher">
+            <button id="lang-en" class="lang-btn active" onclick="switchLanguage('en')">English</button>
+            <button id="lang-ar" class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+        </div>
+    </nav>
+
+    <div class="nav-indicator">
+        <div class="nav-dot active" data-section="intro">
+            <div class="nav-tooltip" data-lang-en="Introduction" data-lang-ar="المقدمة">Introduction</div>
+        </div>
+        <div class="nav-dot" data-section="problem">
+            <div class="nav-tooltip" data-lang-en="Problem" data-lang-ar="المشكلة">Problem</div>
+        </div>
+        <div class="nav-dot" data-section="solution">
+            <div class="nav-tooltip" data-lang-en="Solution" data-lang-ar="الحل">Solution</div>
+        </div>
+        <div class="nav-dot" data-section="benefits">
+            <div class="nav-tooltip" data-lang-en="Benefits" data-lang-ar="الفوائد">Benefits</div>
+        </div>
+        <div class="nav-dot" data-section="market">
+            <div class="nav-tooltip" data-lang-en="Market" data-lang-ar="السوق">Market</div>
+        </div>
+        <div class="nav-dot" data-section="competitive_edge">
+            <div class="nav-tooltip" data-lang-en="Competition" data-lang-ar="المنافسة">Competition</div>
+        </div>
+        <div class="nav-dot" data-section="business_model">
+            <div class="nav-tooltip" data-lang-en="Business Model" data-lang-ar="نموذج العمل">Business Model</div>
+        </div>
+        <div class="nav-dot" data-section="team_costs">
+            <div class="nav-tooltip" data-lang-en="Team & Costs" data-lang-ar="الفريق والتكاليف">Team & Costs</div>
+        </div>
+        <div class="nav-dot" data-section="financials">
+            <div class="nav-tooltip" data-lang-en="Financials" data-lang-ar="الماليات">Financials</div>
+        </div>
+        <div class="nav-dot" data-section="investment">
+            <div class="nav-tooltip" data-lang-en="Investment" data-lang-ar="الاستثمار">Investment</div>
+        </div>
+        <div class="nav-dot" data-section="operational_costs">
+            <div class="nav-tooltip" data-lang-en="Operational Costs" data-lang-ar="التكاليف التشغيلية">Operational Costs</div>
+        </div>
+    </div>
+
+<div id="intro" class="slide">
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Introduction to CORDR Platform" data-lang-ar="مقدمة إلى منصة كوردر">Introduction to CORDR Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p, li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+    </style>
+    <div class="slide-container flex flex-col p-6">
+      <div class="flex flex-col items-center justify-center h-full">
+        <h1 class="mb-6 text-center" data-lang-en="CORDR Platform" data-lang-ar="منصة كوردر">CORDR Platform</h1>
+        <h2 class="mb-10 text-center" data-lang-en="A Promising Investment Opportunity" data-lang-ar="فرصة استثمارية واعدة">A Promising Investment Opportunity</h2>
+
+        <div class="flex justify-center items-center mb-8">
+          <div class="bg-white p-6 rounded-lg shadow-lg max-w-3xl">
+            <p class="text-center text-2xl mb-4" data-lang-en="A unified platform connecting ride-hailing companies, drivers, and passengers" data-lang-ar="منصة موحدة تربط شركات النقل، السائقين، والركاب">
+              A <span class="highlight text-3xl" data-lang-en="unified platform" data-lang-ar="منصة موحدة">unified platform</span> connecting 
+              <span class="highlight" data-lang-en="ride-hailing companies" data-lang-ar="شركات النقل">ride-hailing companies</span>, 
+              <span class="highlight" data-lang-en="drivers" data-lang-ar="السائقين">drivers</span>, and 
+              <span class="highlight" data-lang-en="passengers" data-lang-ar="الركاب">passengers</span>
+            </p>
+
+            <div class="flex justify-center items-center mt-6">
+              <div class="text-center mx-4">
+                <i class="fas fa-building text-blue-600 text-4xl mb-2"></i>
+                <p data-lang-en="Companies" data-lang-ar="الشركات">Companies</p>
+              </div>
+              <div class="text-center mx-4">
+                <i class="fas fa-exchange-alt text-green-600 text-4xl mb-2"></i>
+              </div>
+              <div class="text-center mx-4">
+                <i class="fas fa-car text-blue-600 text-4xl mb-2"></i>
+                <p data-lang-en="Drivers" data-lang-ar="السائقين">Drivers</p>
+              </div>
+              <div class="text-center mx-4">
+                <i class="fas fa-exchange-alt text-green-600 text-4xl mb-2"></i>
+              </div>
+              <div class="text-center mx-4">
+                <i class="fas fa-users text-blue-600 text-4xl mb-2"></i>
+                <p data-lang-en="Passengers" data-lang-ar="الركاب">Passengers</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 mt-4">
+          <div class="bg-white p-4 rounded-lg shadow-md text-center">
+            <i class="fas fa-plug text-blue-600 text-3xl mb-2"></i>
+            <h3 class="text-xl font-bold mb-1" data-lang-en="Connect" data-lang-ar="ربط">Connect</h3>
+            <p class="text-base" data-lang-en="Unified platform connecting all parties" data-lang-ar="منصة موحدة تربط جميع الأطراف">Unified platform connecting all parties</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-lg shadow-md text-center">
+            <i class="fas fa-balance-scale text-green-600 text-3xl mb-2"></i>
+            <h3 class="text-xl font-bold mb-1" data-lang-en="Compare" data-lang-ar="مقارنة">Compare</h3>
+            <p class="text-base" data-lang-en="Transparent price and service comparison" data-lang-ar="مقارنة شفافة للأسعار والخدمات">Transparent price and service comparison</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-lg shadow-md text-center">
+            <i class="fas fa-check-circle text-blue-600 text-3xl mb-2"></i>
+            <h3 class="text-xl font-bold mb-1" data-lang-en="Order" data-lang-ar="طلب">Order</h3>
+            <p class="text-base" data-lang-en="Easy and fast ride booking" data-lang-ar="حجز رحلات سهل وسريع">Easy and fast ride booking</p>
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
+    </div>
+</div>
+
+<div id="problem" class="slide">
+       <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Problem and Challenges" data-lang-ar="المشكلة والتحديات">Problem and Challenges</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #FFFFFF;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p, li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+    </style>
+    <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center" data-lang-en="Problem and Challenges" data-lang-ar="المشكلة والتحديات">Problem and Challenges</h1>
+
+      <div class="flex justify-evenly items-start">
+        <div class="w-1/2 pr-6">
+          <h2 class="mb-4" data-lang-en="Current Challenges" data-lang-ar="التحديات الحالية">Current Challenges</h2>
+
+          <div class="grid grid-rows-3 gap-3">
+            <div class="bg-blue-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-blue-600 mb-1" data-lang-en="Company Challenges:" data-lang-ar="تحديات الشركات:"><i class="fas fa-building mr-2"></i> Company Challenges:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="High costs of developing and maintaining proprietary apps" data-lang-ar="ارتفاع تكاليف تطوير وصيانة التطبيقات الخاصة">High costs of developing and maintaining <span class="highlight" data-lang-en="proprietary apps" data-lang-ar="التطبيقات الخاصة">proprietary apps</span></li>
+                <li data-lang-en="Difficulty attracting and retaining drivers" data-lang-ar="صعوبة جذب السائقين والاحتفاظ بهم">Difficulty <span class="highlight" data-lang-en="attracting and retaining drivers" data-lang-ar="جذب السائقين والاحتفاظ بهم">attracting and retaining drivers</span></li>
+                <li data-lang-en="Evolving regulatory compliance challenges" data-lang-ar="تحديات الامتثال التنظيمي المتغيرة">Evolving <span class="highlight" data-lang-en="regulatory compliance" data-lang-ar="الامتثال التنظيمي">regulatory compliance</span> challenges</li>
+              </ul>
+            </div>
+
+            <div class="bg-green-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-green-600 mb-1" data-lang-en="Driver Challenges:" data-lang-ar="تحديات السائقين:"><i class="fas fa-car mr-2"></i> Driver Challenges:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Need to install multiple apps to work with different companies" data-lang-ar="الحاجة إلى تثبيت تطبيقات متعددة للعمل مع شركات مختلفة">Need to install <span class="highlight" data-lang-en="multiple apps" data-lang-ar="تطبيقات متعددة">multiple apps</span> to work with different companies</li>
+                <li data-lang-en="Difficulty comparing offers and opportunities between companies" data-lang-ar="صعوبة مقارنة العروض والفرص بين الشركات">Difficulty <span class="highlight" data-lang-en="comparing offers" data-lang-ar="مقارنة العروض">comparing offers</span> and opportunities between companies</li>
+                <li data-lang-en="Lack of additional benefits (insurance, maintenance, fuel)" data-lang-ar="نقص المزايا الإضافية (التأمين، الصيانة، الوقود)">Lack of <span class="highlight" data-lang-en="additional benefits" data-lang-ar="المزايا الإضافية">additional benefits</span> (insurance, maintenance, fuel)</li>
+              </ul>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-blue-600 mb-1" data-lang-en="Passenger Challenges:" data-lang-ar="تحديات الركاب:"><i class="fas fa-users mr-2"></i> Passenger Challenges:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Need to install multiple apps for comparison" data-lang-ar="الحاجة إلى تثبيت تطبيقات متعددة للمقارنة">Need to install <span class="highlight" data-lang-en="multiple apps" data-lang-ar="تطبيقات متعددة">multiple apps</span> for comparison</li>
+                <li data-lang-en="Difficulty comparing prices in real-time" data-lang-ar="صعوبة مقارنة الأسعار في الوقت الفعلي">Difficulty <span class="highlight" data-lang-en="comparing prices" data-lang-ar="مقارنة الأسعار">comparing prices</span> in real-time</li>
+                <li data-lang-en="Varying service quality across apps" data-lang-ar="تفاوت جودة الخدمة عبر التطبيقات">Varying <span class="highlight" data-lang-en="service quality" data-lang-ar="جودة الخدمة">service quality</span> across apps</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-1/2">
+          <div style="height: 350px;">
+            <canvas id="challengesChart"></canvas>
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Current Market Situation:" data-lang-ar="وضع السوق الحالي:">Current Market Situation:</h3>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="mb-2" data-lang-en="The ride-hailing market suffers from significant fragmentation, where:" data-lang-ar="يعاني سوق خدمات النقل من تجزئة كبيرة، حيث:">The ride-hailing market suffers from significant fragmentation, where:</p>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Passengers use 3-5 apps on average" data-lang-ar="يستخدم الركاب 3-5 تطبيقات في المتوسط">Passengers use <span class="highlight" data-lang-en="3-5 apps" data-lang-ar="3-5 تطبيقات">3-5 apps</span> on average</li>
+                <li data-lang-en="Drivers work with 2-3 companies simultaneously" data-lang-ar="يعمل السائقون مع 2-3 شركات في نفس الوقت">Drivers work with <span class="highlight" data-lang-en="2-3 companies" data-lang-ar="2-3 شركات">2-3 companies</span> simultaneously</li>
+                <li data-lang-en="Companies spend 25-40% of their budget on technical development" data-lang-ar="تنفق الشركات 25-40% من ميزانيتها على التطوير التقني">Companies spend <span class="highlight" data-lang-en="25-40%" data-lang-ar="25-40%">25-40%</span> of their budget on technical development</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Editable data
+      const challengesData = {
+        labels: ['Multiple Apps', 'Comparison Difficulty', 'Development Costs', 'Regulatory Compliance', 'Driver Attraction'],
+        datasets: [
+          {
+            label: 'Challenge Level (1-10)',
+            data: [8, 9, 7, 8, 9],
+            backgroundColor: [
+              'rgba(30, 136, 229, 0.6)',
+              'rgba(76, 175, 80, 0.6)',
+              'rgba(30, 136, 229, 0.6)',
+              'rgba(76, 175, 80, 0.6)',
+              'rgba(30, 136, 229, 0.6)'
+            ],
+            borderColor: [
+              'rgba(30, 136, 229, 1)',
+              'rgba(76, 175, 80, 1)',
+              'rgba(30, 136, 229, 1)',
+              'rgba(76, 175, 80, 1)',
+              'rgba(30, 136, 229, 1)'
+            ],
+            borderWidth: 1
+          }
+        ]
+      };
+
+      // Create chart when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('challengesChart');
+        if (ctx) {
+          const myChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: challengesData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Ride-Hailing Market Challenges (Editable)',
+                  font: {
+                    size: 18
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  max: 10,
+                  title: {
+                    display: true,
+                    text: 'Challenge Level (1-10)',
+                    font: {
+                      size: 14
+                    }
+                  }
+                }
+              }
+            }
+          });
+
+          // Add editing capability on click
+          ctx.onclick = function(evt) {
+            const activePoints = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+
+            if (activePoints.length > 0) {
+              const firstPoint = activePoints[0];
+              const index = firstPoint.index;
+              const label = myChart.data.labels[index];
+              const value = myChart.data.datasets[0].data[index];
+
+              const newValue = prompt(`Enter new value for "${label}" (1-10):`, value);
+
+              if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 10) {
+                myChart.data.datasets[0].data[index] = Number(newValue);
+                myChart.update();
+              }
+            }
+          };
+        }
+      });
+    </script>
+
+<div id="solution" class="slide">
+     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Solution: CORDR Platform" data-lang-ar="الحل: منصة كوردر">Solution: CORDR Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #FFFFFF;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p, li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+    </style>
+    <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center" data-lang-en="Solution: CORDR Platform" data-lang-ar="الحل: منصة كوردر">Solution: CORDR Platform</h1>
+
+      <div class="flex justify-evenly items-start">
+        <div class="w-1/2 pr-6">
+          <h2 class="mb-4" data-lang-en="How CORDR Works?" data-lang-ar="كيف تعمل منصة كوردر؟">How CORDR Works?</h2>
+
+          <div class="grid grid-rows-3 gap-3">
+            <div class="bg-blue-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-blue-600 mb-1" data-lang-en="For Companies:" data-lang-ar="للشركات:"><i class="fas fa-building mr-2"></i> For Companies:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Ready-to-use SaaS platform with no development costs" data-lang-ar="منصة SaaS جاهزة للاستخدام بدون تكاليف تطوير">Ready-to-use <span class="highlight" data-lang-en="SaaS platform" data-lang-ar="منصة SaaS">SaaS platform</span> with no development costs</li>
+                <li data-lang-en="Driver management and ride system" data-lang-ar="نظام إدارة السائقين والرحلات">Driver management and ride system</li>
+                <li data-lang-en="Full regulatory compliance support" data-lang-ar="دعم كامل للامتثال التنظيمي">Full <span class="highlight" data-lang-en="regulatory compliance" data-lang-ar="الامتثال التنظيمي">regulatory compliance</span> support</li>
+                <li data-lang-en="Advanced analytics for performance optimization" data-lang-ar="تحليلات متقدمة لتحسين الأداء">Advanced <span class="highlight" data-lang-en="advanced analytics" data-lang-ar="تحليلات متقدمة">advanced analytics</span> for performance optimization</li>
+              </ul>
+            </div>
+
+            <div class="bg-green-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-green-600 mb-1" data-lang-en="For Drivers:" data-lang-ar="للسائقين:"><i class="fas fa-car mr-2"></i> For Drivers:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Unified app to work with all companies" data-lang-ar="تطبيق موحد للعمل مع جميع الشركات">Unified app to work with all companies</li>
+                <li data-lang-en="Ability to compare offers and choose the best" data-lang-ar="القدرة على مقارنة العروض واختيار الأفضل">Ability to <span class="highlight" data-lang-en="compare offers" data-lang-ar="مقارنة العروض">compare offers</span> and choose the best</li>
+                <li data-lang-en="Additional benefits (fuel discounts, maintenance, insurance)" data-lang-ar="مزايا إضافية (خصومات وقود، صيانة، تأمين)">Additional benefits (fuel discounts, maintenance, insurance)</li>
+              </ul>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg">
+              <h3 class="text-xl font-bold text-blue-600 mb-1" data-lang-en="For Passengers:" data-lang-ar="للركاب:"><i class="fas fa-users mr-2"></i> For Passengers:</h3>
+              <ul class="list-disc list-inside">
+                <li data-lang-en="One app for all transportation services" data-lang-ar="تطبيق واحد لجميع خدمات النقل">One app for all transportation services</li>
+                <li data-lang-en="Real-time price comparison" data-lang-ar="مقارنة الأسعار في الوقت الفعلي">Real-time price comparison</li>
+                <li data-lang-en="Choose the best service based on price and rating" data-lang-ar="اختيار أفضل خدمة بناءً على السعر والتقييم">Choose the best service based on price and rating</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-1/2">
+          <div style="height: 350px;">
+            <canvas id="solutionChart"></canvas>
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Operating Model:" data-lang-ar="نموذج التشغيل:">Operating Model:</h3>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <div class="flex items-center justify-center mb-3">
+                <div class="text-center mx-4">
+                  <i class="fas fa-building text-blue-600 text-3xl"></i>
+                  <p class="text-sm" data-lang-en="Companies" data-lang-ar="الشركات">Companies</p>
+                </div>
+                <i class="fas fa-arrow-right text-green-600 mx-2"></i>
+                <div class="text-center mx-4">
+                  <i class="fas fa-mobile-alt text-blue-600 text-3xl"></i>
+                  <p class="text-sm" data-lang-en="CORDR Platform" data-lang-ar="منصة كوردر">CORDR Platform</p>
+                </div>
+                <i class="fas fa-arrow-right text-green-600 mx-2"></i>
+                <div class="text-center mx-4">
+                  <i class="fas fa-car text-blue-600 text-3xl"></i>
+                  <p class="text-sm" data-lang-en="Drivers" data-lang-ar="السائقين">Drivers</p>
+                </div>
+                <i class="fas fa-arrow-right text-green-600 mx-2"></i>
+                <div class="text-center mx-4">
+                  <i class="fas fa-users text-blue-600 text-3xl"></i>
+                  <p class="text-sm" data-lang-en="Passengers" data-lang-ar="الركاب">Passengers</p>
+                </div>
+              </div>
+              <p class="text-center" data-lang-en="A unified platform connecting all parties and facilitating interaction between them" data-lang-ar="منصة موحدة تربط جميع الأطراف وتسهل التفاعل بينهم">A unified platform connecting all parties and facilitating interaction between them</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Editable data
+      const solutionData = {
+        labels: ['Development Costs', 'Ease of Comparison', 'Operational Efficiency', 'User Satisfaction', 'Regulatory Compliance'],
+        datasets: [
+          {
+            label: 'Current Situation',
+            data: [3, 2, 4, 3, 4],
+            backgroundColor: 'rgba(30, 136, 229, 0.2)',
+            borderColor: 'rgba(30, 136, 229, 1)',
+            borderWidth: 1,
+            pointBackgroundColor: 'rgba(30, 136, 229, 1)',
+            pointRadius: 5
+          },
+          {
+            label: 'With CORDR Platform',
+            data: [8, 9, 8, 9, 9],
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            borderWidth: 1,
+            pointBackgroundColor: 'rgba(76, 175, 80, 1)',
+            pointRadius: 5
+          }
+        ]
+      };
+
+      // Create chart when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('solutionChart');
+        if (ctx) {
+          const myChart = new Chart(ctx.getContext('2d'), {
+            type: 'radar',
+            data: solutionData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Solution Comparison (Editable)',
+                  font: {
+                    size: 18
+                  }
+                }
+              },
+              scales: {
+                r: {
+                  beginAtZero: true,
+                  max: 10,
+                  ticks: {
+                    display: false
+                  }
+                }
+              }
+            }
+          });
+
+          // Add editing capability on click
+          ctx.onclick = function(evt) {
+            const activePoints = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+
+            if (activePoints.length > 0) {
+              const firstPoint = activePoints[0];
+              const datasetIndex = firstPoint.datasetIndex;
+              const index = firstPoint.index;
+              const label = myChart.data.labels[index];
+              const datasetLabel = myChart.data.datasets[datasetIndex].label;
+              const value = myChart.data.datasets[datasetIndex].data[index];
+
+              const newValue = prompt(`Enter new value for "${label}" (${datasetLabel}) (0-10):`, value);
+
+              if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 10) {
+                myChart.data.datasets[datasetIndex].data[index] = Number(newValue);
+                myChart.update();
+              }
+            }
+          };
+        }
+      });
+    </script>
+
+<div id="benefits" class="slide">
+    <div class="card">
+    </style>
+  </head>
+  <body>
+   <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center">Benefits for All Stakeholders</h1>
+
+      <div class="grid grid-cols-3 gap-6 mt-4">
+        <div class="col-span-1">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title
+      data-lang-en="Benefits for Companies, Drivers, and Passengers"
+      data-lang-ar="الفوائد للشركات والسائقين والركاب"
+    ></title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        direction: ltr;
+      }
+      body.ar {
+        font-family: 'Tajawal', sans-serif;
+        direction: rtl;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #FFFFFF;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p,
+      li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+      .benefit-card {
+        transition: transform 0.3s ease;
+      }
+      .benefit-card:hover {
+        transform: translateY(-5px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center"></h1>
+
+      <div class="grid grid-cols-3 gap-6 mt-4">
+        <div class="col-span-1">
+          <!-- For Companies -->
+          <h2
+            class="mb-4 text-center"
+            data-lang-en="For Companies"
+            data-lang-ar="للشركات"
+          >For Companies</h2>
+
+          <div class="space-y-4">
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i
+                  class="fas fa-money-bill-wave text-blue-600 text-2xl mr-3"
+                ></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Cost Reduction"
+                  data-lang-ar="خفض التكاليف"
+                >Cost Reduction</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Reduce development and maintenance costs by 60‑80% compared to building proprietary apps"
+                data-lang-ar="خفض تكاليف التطوير والصيانة بنسبة 60‑80٪ مقارنة ببناء تطبيقات مخصصة"
+              >Reduce development and maintenance costs by <span class="highlight">60‑80%</span> compared to building proprietary apps</p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-users text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Driver Access"
+                  data-lang-ar="الوصول إلى السائقين"
+                >Driver Access</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Access a larger pool of drivers already registered on the platform"
+                data-lang-ar="الوصول إلى عدد أكبر من السائقين المسجلين مسبقًا على المنصة"
+              >Access a <span class="highlight">larger pool of drivers</span> already registered on the platform</p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-chart-line text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Analytics"
+                  data-lang-ar="تحليلات"
+                >Analytics</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Advanced business intelligence and analytics to optimize operations"
+                data-lang-ar="ذكاء وتحليلات أعمال متقدمة لتحسين العمليات"
+              >Advanced <span class="highlight">business intelligence</span> and analytics to optimize operations</p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-shield-alt text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Compliance"
+                  data-lang-ar="الامتثال"
+                >Compliance</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Built-in regulatory compliance features for different markets"
+                data-lang-ar="ميزات امتثال تنظيمي مدمجة للأسواق المختلفة"
+              >Built-in <span class="highlight">regulatory compliance</span> features for different markets</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-1">
+          <!-- For Drivers -->
+          <h2
+            class="mb-4 text-center"
+            data-lang-en="For Drivers"
+            data-lang-ar="للسائقين"
+          >For Drivers</h2>
+
+          <div class="space-y-4">
+            <div class="benefit-card bg-green-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-mobile-alt text-green-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="One App"
+                  data-lang-ar="تطبيق واحد"
+                >One App</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Use a single app to work with multiple companies"
+                data-lang-ar="استخدم تطبيقًا واحدًا للعمل مع عدة شركات"
+              >Use a <span class="highlight">single app</span> to work with multiple companies</p>
+            </div>
+
+            <div class="benefit-card bg-green-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-balance-scale text-green-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Comparison"
+                  data-lang-ar="مقارنة"
+                >Comparison</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Compare and choose the best offers from different companies"
+                data-lang-ar="قارن واختر أفضل العروض من شركات مختلفة"
+              >Compare and choose the <span class="highlight">best offers</span> from different companies</p>
+            </div>
+
+            <div class="benefit-card bg-green-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-gas-pump text-green-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Benefits"
+                  data-lang-ar="المزايا"
+                >Benefits</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Access exclusive benefits like fuel discounts, insurance, and maintenance deals"
+                data-lang-ar="احصل على مزايا حصرية مثل خصومات الوقود والتأمين وصفقات الصيانة"
+              >Access <span class="highlight">exclusive benefits</span> like fuel discounts, insurance, and maintenance deals</p>
+            </div>
+
+            <div class="benefit-card bg-green-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-calendar-alt text-green-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Flexibility"
+                  data-lang-ar="المرونة"
+                >Flexibility</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Greater work flexibility with multiple companies to choose from"
+                data-lang-ar="مرونة أكبر في العمل مع إمكانية اختيار عدة شركات"
+              >Greater <span class="highlight">work flexibility</span> with multiple companies to choose from</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-1">
+          <!-- For Passengers -->
+          <h2
+            class="mb-4 text-center"
+            data-lang-en="For Passengers"
+            data-lang-ar="للركاب"
+          >For Passengers</h2>
+
+          <div class="space-y-4">
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-search-dollar text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Price Comparison"
+                  data-lang-ar="مقارنة الأسعار"
+                >Price Comparison</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Compare real-time prices from multiple companies in one app"
+                data-lang-ar="مقارنة الأسعار المباشرة من عدة شركات في تطبيق واحد"
+              >Compare <span class="highlight">real-time prices</span> from multiple companies in one app</p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-star text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Quality Choice"
+                  data-lang-ar="اختيار الجودة"
+                >Quality Choice</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Choose based on price, rating, or arrival time"
+                data-lang-ar="اختر بناءً على السعر أو التقييم أو وقت الوصول"
+              >Choose based on <span class="highlight">price, rating, or arrival time</span></p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-clock text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Time Saving"
+                  data-lang-ar="توفير الوقت"
+                >Time Saving</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Save time by avoiding multiple app installations and switching"
+                data-lang-ar="وفر الوقت من خلال تجنب تثبيت عدة تطبيقات والتبديل بينها"
+              >Save time by <span class="highlight">avoiding multiple app installations</span> and switching</p>
+            </div>
+
+            <div class="benefit-card bg-blue-50 p-4 rounded-lg shadow-md">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-tag text-blue-600 text-2xl mr-3"></i>
+                <h3
+                  class="text-xl font-bold"
+                  data-lang-en="Promotions"
+                  data-lang-ar="العروض الترويجية"
+                >Promotions</h3>
+              </div>
+              <p
+                class="text-base"
+                data-lang-en="Access special offers and promotions from all companies in one place"
+                data-lang-ar="الوصول إلى العروض الترويجية من جميع الشركات في مكان واحد"
+              >Access <span class="highlight">special offers and promotions</span> from all companies in one place</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <div style="height: 250px;">
+          <canvas id="benefitsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="mt-6 grid grid-cols-2 gap-4">
+        <div style="height: 250px;">
+          <canvas id="benefitsChart-second"></canvas>
+        </div>
+        <div style="height: 250px;">
+          <canvas id="satisfactionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/language.js"></script>
+    <script>
+      // ... باقي السكربت كما هو
+      // Editable benefits data
+      const benefitsData = {
+        labels: [
+          { en: 'Cost Savings', ar: 'توفير التكاليف' },
+          { en: 'Time Efficiency', ar: 'كفاءة الوقت' },
+          { en: 'User Satisfaction', ar: 'رضا المستخدمين' },
+          { en: 'Revenue Growth', ar: 'نمو الإيرادات' },
+          { en: 'Market Reach', ar: 'الوصول للسوق' }
+        ],
+        datasets: [
+          {
+            label: { en: 'Companies', ar: 'الشركات' },
+            data: [85, 70, 75, 80, 65],
+            backgroundColor: 'rgba(30, 136, 229, 0.7)',
+          },
+          {
+            label: { en: 'Drivers', ar: 'السائقين' },
+            data: [60, 90, 85, 75, 80],
+            backgroundColor: 'rgba(76, 175, 80, 0.7)',
+          },
+          {
+            label: { en: 'Passengers', ar: 'الركاب' },
+            data: [75, 85, 80, 60, 70],
+            backgroundColor: 'rgba(255, 152, 0, 0.7)',
+          }
+        ]
+      };
+
+      // Satisfaction data
+      const satisfactionData = {
+        labels: [
+          { en: 'Very Satisfied', ar: 'راضٍ جداً' },
+          { en: 'Satisfied', ar: 'راضٍ' },
+          { en: 'Neutral', ar: 'محايد' },
+          { en: 'Dissatisfied', ar: 'غير راضٍ' },
+          { en: 'Very Dissatisfied', ar: 'غير راضٍ جداً' }
+        ],
+        datasets: [
+          {
+            label: { en: 'Overall Satisfaction', ar: 'الرضا العام' },
+            data: [45, 35, 15, 3, 2],
+            backgroundColor: [
+              'rgba(76, 175, 80, 0.8)',
+              'rgba(139, 195, 74, 0.8)',
+              'rgba(255, 193, 7, 0.8)',
+              'rgba(255, 152, 0, 0.8)',
+              'rgba(244, 67, 54, 0.8)'
+            ],
+            borderColor: [
+              'rgba(76, 175, 80, 1)',
+              'rgba(139, 195, 74, 1)',
+              'rgba(255, 193, 7, 1)',
+              'rgba(255, 152, 0, 1)',
+              'rgba(244, 67, 54, 1)'
+            ],
+            borderWidth: 1
+          }
+        ]
+      };
+
+      // Create charts
+      let benefitsChart, satisfactionChart;
+
+      function renderBenefitsChart(lang) {
+        if (benefitsChart) {
+          benefitsChart.destroy();
+        }
+        const ctx = document.getElementById('benefitsChart').getContext('2d');
+        benefitsChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: benefitsData.labels.map(l => l[lang]),
+            datasets: [
+              {
+                label: benefitsData.datasets[0].label[lang],
+                data: benefitsData.datasets[0].data,
+                backgroundColor: benefitsData.datasets[0].backgroundColor,
+              },
+              {
+                label: benefitsData.datasets[1].label[lang],
+                data: benefitsData.datasets[1].data,
+                backgroundColor: benefitsData.datasets[1].backgroundColor,
+              },
+              {
+                label: benefitsData.datasets[2].label[lang],
+                data: benefitsData.datasets[2].data,
+                backgroundColor: benefitsData.datasets[2].backgroundColor,
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: lang === 'en' ? 'Benefits by Stakeholder Group (%) - Editable' : 'الفوائد حسب مجموعة أصحاب المصلحة (%) - قابل للتعديل',
+                font: {
+                  size: 16
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.dataset.label}: ${context.raw}%`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                title: {
+                  display: true,
+                  text: lang === 'en' ? 'Benefit Level (%)' : 'مستوى الفائدة (%)',
+                  font: {
+                    size: 12
+                  }
+                }
+              }
+            },
+            onClick: function(evt, activeElements) {
+              if (activeElements.length > 0) {
+                const firstPoint = activeElements[0];
+                const datasetIndex = firstPoint.datasetIndex;
+                const index = firstPoint.index;
+                const category = benefitsData.labels[index][lang];
+                const stakeholder = benefitsData.datasets[datasetIndex].label[lang];
+                const value = benefitsData.datasets[datasetIndex].data[index];
+
+                const newValue = prompt(`${lang === 'en' ? 'Enter new value for' : 'أدخل قيمة جديدة لـ'} ${stakeholder} ${lang === 'en' ? 'in' : 'في'} "${category}" (0-100%):`, value);
+
+                if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 100) {
+                  benefitsData.datasets[datasetIndex].data[index] = Number(newValue);
+                  renderBenefitsChart(lang);
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function renderSatisfactionChart(lang) {
+        if (satisfactionChart) {
+          satisfactionChart.destroy();
+        }
+        const ctx = document.getElementById('satisfactionChart').getContext('2d');
+        satisfactionChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: satisfactionData.labels.map(l => l[lang]),
+            datasets: [
+              {
+                label: satisfactionData.datasets[0].label[lang],
+                data: satisfactionData.datasets[0].data,
+                backgroundColor: satisfactionData.datasets[0].backgroundColor,
+                borderColor: satisfactionData.datasets[0].borderColor,
+                borderWidth: satisfactionData.datasets[0].borderWidth
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: lang === 'en' ? 'User Satisfaction Distribution (%) - Editable' : 'توزيع رضا المستخدمين (%) - قابل للتعديل',
+                font: {
+                  size: 16
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.label}: ${context.raw}%`;
+                  }
+                }
+              }
+            },
+            onClick: function(evt, activeElements) {
+              if (activeElements.length > 0) {
+                const firstPoint = activeElements[0];
+                const index = firstPoint.index;
+                const category = satisfactionData.labels[index][lang];
+                const value = satisfactionData.datasets[0].data[index];
+
+                const newValue = prompt(`${lang === 'en' ? 'Enter new value for' : 'أدخل قيمة جديدة لـ'} "${category}" (0-100%):`, value);
+
+                if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 100) {
+                  satisfactionData.datasets[0].data[index] = Number(newValue);
+
+                  // Normalize to 100%
+                  const total = satisfactionData.datasets[0].data.reduce((a, b) => a + b, 0);
+                  if (total > 0) {
+                    satisfactionData.datasets[0].data = satisfactionData.datasets[0].data.map(val => 
+                      Math.round((val / total) * 100)
+                    );
+                  }
+
+                  renderSatisfactionChart(lang);
+                }
+              }
+            }
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderBenefitsChart(currentLang);
+        renderSatisfactionChart(currentLang);
+      });
+
+      window.updatePageContent = function(lang) {
+        renderBenefitsChart(lang);
+        renderSatisfactionChart(lang);
+      };
+    </script>
+  </body>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="market" class="slide">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Market Size and Opportunity" data-lang-ar="حجم السوق والفرص">Market Size and Opportunity</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #FFFFFF;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p, li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+    </style>
+    <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center" data-lang-en="Market Size and Opportunity" data-lang-ar="حجم السوق والفرص">Market Size and Opportunity</h1>
+
+      <div class="flex justify-evenly items-start">
+        <div class="w-1/2 pr-6">
+          <h2 class="mb-4" data-lang-en="Global Ride-Hailing Market" data-lang-ar="سوق خدمات النقل العالمي">Global Ride-Hailing Market</h2>
+
+          <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Market Overview:" data-lang-ar="نظرة عامة على السوق:">Market Overview:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="Global market size: $120 billion (2024)" data-lang-ar="حجم السوق العالمي: 120 مليار دولار (2024)">Global market size: <span class="highlight" data-lang-en="$120 billion" data-lang-ar="120 مليار دولار">$120 billion</span> (2024)</li>
+              <li data-lang-en="Expected to reach $230 billion by 2030" data-lang-ar="من المتوقع أن يصل إلى 230 مليار دولار بحلول عام 2030">Expected to reach <span class="highlight" data-lang-en="$230 billion" data-lang-ar="230 مليار دولار">$230 billion</span> by 2030</li>
+              <li data-lang-en="Annual growth rate: 11.5%" data-lang-ar="معدل النمو السنوي: 11.5%">Annual growth rate: <span class="highlight" data-lang-en="11.5%" data-lang-ar="11.5%">11.5%</span></li>
+              <li data-lang-en="Over 2.5 billion users worldwide" data-lang-ar="أكثر من 2.5 مليار مستخدم حول العالم">Over <span class="highlight" data-lang-en="2.5 billion" data-lang-ar="2.5 مليار">2.5 billion</span> users worldwide</li>
+            </ul>
+          </div>
+
+          <div class="bg-green-50 p-4 rounded-lg">
+            <h3 class="text-xl font-bold text-green-600 mb-2" data-lang-en="Middle East & North Africa:" data-lang-ar="الشرق الأوسط وشمال أفريقيا:">Middle East & North Africa:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="MENA market size: $7.5 billion (2024)" data-lang-ar="حجم سوق الشرق الأوسط وشمال أفريقيا: 7.5 مليار دولار (2024)">MENA market size: <span class="highlight" data-lang-en="$7.5 billion" data-lang-ar="7.5 مليار دولار">$7.5 billion</span> (2024)</li>
+              <li data-lang-en="Expected to reach $18 billion by 2030" data-lang-ar="من المتوقع أن يصل إلى 18 مليار دولار بحلول عام 2030">Expected to reach <span class="highlight" data-lang-en="$18 billion" data-lang-ar="18 مليار دولار">$18 billion</span> by 2030</li>
+              <li data-lang-en="Annual growth rate: 15.8%" data-lang-ar="معدل النمو السنوي: 15.8%">Annual growth rate: <span class="highlight" data-lang-en="15.8%" data-lang-ar="15.8%">15.8%</span></li>
+              <li data-lang-en="Saudi market: $2.3 billion with 20% annual growth" data-lang-ar="السوق السعودي: 2.3 مليار دولار بمعدل نمو سنوي 20%">Saudi market: <span class="highlight" data-lang-en="$2.3 billion" data-lang-ar="2.3 مليار دولار">$2.3 billion</span> with <span class="highlight" data-lang-en="20% annual growth" data-lang-ar="نمو سنوي 20%">20% annual growth</span></li>
+              <li data-lang-en="Over 120 million users in the region" data-lang-ar="أكثر من 120 مليون مستخدم في المنطقة">Over <span class="highlight" data-lang-en="120 million" data-lang-ar="120 مليون">120 million</span> users in the region</li>
+            </ul>
+          </div>
+
+          <div class="mt-4">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Key Market Drivers:" data-lang-ar="المحركات الرئيسية للسوق:">Key Market Drivers:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="Increasing smartphone penetration" data-lang-ar="تزايد انتشار الهواتف الذكية">Increasing smartphone penetration</li>
+              <li data-lang-en="Growing urbanization and traffic congestion" data-lang-ar="تزايد التحضر والازدحام المروري">Growing urbanization and traffic congestion</li>
+              <li data-lang-en="Regulatory support for digital transportation" data-lang-ar="الدعم التنظيمي للنقل الرقمي">Regulatory support for digital transportation</li>
+              <li data-lang-en="Rising demand for convenient mobility solutions" data-lang-ar="تزايد الطلب على حلول التنقل المريحة">Rising demand for convenient mobility solutions</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="w-1/2">
+          <div style="height: 350px;">
+            <canvas id="marketChart"></canvas>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="CORDR's Market Opportunity:" data-lang-ar="فرصة سوق كوردر:">CORDR's Market Opportunity:</h3>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <ul class="list-disc list-inside">
+                <li data-lang-en="Initial target: Saudi Arabia ($2.3B market)" data-lang-ar="الهدف الأولي: المملكة العربية السعودية (سوق 2.3 مليار دولار)">Initial target: <span class="highlight" data-lang-en="Saudi Arabia" data-lang-ar="المملكة العربية السعودية">Saudi Arabia</span> (<span class="highlight" data-lang-en="$2.3B market" data-lang-ar="سوق 2.3 مليار دولار">$2.3B market</span>)</li>
+                <li data-lang-en="Expansion to GCC countries within 2 years" data-lang-ar="التوسع إلى دول مجلس التعاون الخليجي خلال سنتين">Expansion to <span class="highlight" data-lang-en="GCC countries" data-lang-ar="دول مجلس التعاون الخليجي">GCC countries</span> within 2 years</li>
+                <li data-lang-en="Further expansion to MENA region within 3 years" data-lang-ar="توسع إضافي إلى منطقة الشرق الأوسط وشمال أفريقيا خلال 3 سنوات">Further expansion to <span class="highlight" data-lang-en="MENA region" data-lang-ar="منطقة الشرق الأوسط وشمال أفريقيا">MENA region</span> within 3 years</li>
+                <li data-lang-en="Potential to capture 15-20% of the market" data-lang-ar="إمكانية الاستحواذ على 15-20% من السوق">Potential to capture <span class="highlight" data-lang-en="15-20%" data-lang-ar="15-20%">15-20%</span> of the market</li>
+                <li data-lang-en="Estimated revenue by Year 3: $350 million" data-lang-ar="الإيرادات المقدرة بحلول السنة الثالثة: 350 مليون دولار">Estimated revenue by Year 3: <span class="highlight" data-lang-en="$350 million" data-lang-ar="350 مليون دولار">$350 million</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Editable market data
+      const marketData = {
+        labels: ['2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+        datasets: [
+          {
+            label: 'Global Market ($ Billions)',
+            data: [120, 135, 150, 168, 187, 208, 230],
+            backgroundColor: 'rgba(30, 136, 229, 0.2)',
+            borderColor: 'rgba(30, 136, 229, 1)',
+            borderWidth: 2,
+            yAxisID: 'y'
+          },
+          {
+            label: 'MENA Market ($ Billions)',
+            data: [7.5, 8.7, 10.1, 11.7, 13.5, 15.6, 18],
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            borderWidth: 2,
+            yAxisID: 'y1'
+          }
+        ]
+      };
+
+      // Create chart when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('marketChart');
+        if (ctx) {
+          const myChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: marketData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: 'index',
+                intersect: false,
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Ride-Hailing Market Growth Forecast (Editable)',
+                  font: {
+                    size: 18
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  type: 'linear',
+                  display: true,
+                  position: 'left',
+                  title: {
+                    display: true,
+                    text: 'Global Market ($ Billions)',
+                    font: {
+                      size: 14
+                    }
+                  }
+                },
+                y1: {
+                  type: 'linear',
+                  display: true,
+                  position: 'right',
+                  title: {
+                    display: true,
+                    text: 'MENA Market ($ Billions)',
+                    font: {
+                      size: 14
+                    }
+                  },
+                  grid: {
+                    drawOnChartArea: false,
+                  },
+                }
+              }
+            }
+          });
+
+          // Add editing capability on click
+          ctx.onclick = function(evt) {
+            const activePoints = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+
+            if (activePoints.length > 0) {
+              const firstPoint = activePoints[0];
+              const datasetIndex = firstPoint.datasetIndex;
+              const index = firstPoint.index;
+              const year = myChart.data.labels[index];
+              const datasetLabel = myChart.data.datasets[datasetIndex].label;
+              const value = myChart.data.datasets[datasetIndex].data[index];
+
+              const newValue = prompt(`Enter new value for ${year} (${datasetLabel}):`, value);
+
+              if (newValue !== null && !isNaN(newValue) && newValue >= 0) {
+                myChart.data.datasets[datasetIndex].data[index] = Number(newValue);
+                myChart.update();
+              }
+            }
+          };
+        }
+      });
+    </script>
+
+<div id="competitive_edge" class="slide">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="Competitive Edge" data-lang-ar="الميزة التنافسية">Competitive Edge</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      .slide-container {
+        width: 1280px;
+        min-height: 720px;
+        background: #FFFFFF;
+        margin: 0 auto;
+        overflow: hidden;
+        position: relative;
+      }
+      h1 {
+        color: #1E88E5;
+        font-size: 72px;
+        font-weight: 700;
+      }
+      h2 {
+        color: #1E88E5;
+        font-size: 36px;
+        font-weight: 500;
+      }
+      p, li {
+        color: #212121;
+        font-size: 24px;
+        font-weight: 400;
+      }
+      .highlight {
+        color: #4CAF50;
+        font-weight: 500;
+      }
+    </style>
+    <div class="slide-container flex flex-col p-6">
+      <h1 class="mb-4 text-center" data-lang-en="Competitive Edge" data-lang-ar="الميزة التنافسية">Competitive Edge</h1>
+
+      <div class="flex justify-evenly items-start">
+        <div class="w-1/2 pr-6">
+          <h2 class="mb-4" data-lang-en="CORDR vs. Competitors" data-lang-ar="كوردر مقابل المنافسين">CORDR vs. Competitors</h2>
+
+          <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Traditional Ride-Hailing Apps:" data-lang-ar="تطبيقات النقل التقليدية:">Traditional Ride-Hailing Apps:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="Focus on single company service" data-lang-ar="التركيز على خدمة شركة واحدة">Focus on <span class="highlight" data-lang-en="single company" data-lang-ar="شركة واحدة">single company</span> service</li>
+              <li data-lang-en="Require significant investment in app development" data-lang-ar="تتطلب استثمارًا كبيرًا في تطوير التطبيقات">Require <span class="highlight" data-lang-en="significant investment" data-lang-ar="استثمارًا كبيرًا">significant investment</span> in app development</li>
+              <li data-lang-en="Limited regulatory compliance support" data-lang-ar="دعم محدود للامتثال التنظيمي">Limited <span class="highlight" data-lang-en="regulatory compliance" data-lang-ar="الامتثال التنظيمي">regulatory compliance</span> support</li>
+              <li data-lang-en="Compete for same driver pool" data-lang-ar="التنافس على نفس مجموعة السائقين">Compete for <span class="highlight" data-lang-en="same driver pool" data-lang-ar="نفس مجموعة السائقين">same driver pool</span></li>
+            </ul>
+          </div>
+
+          <div class="bg-green-50 p-4 rounded-lg mb-4">
+            <h3 class="text-xl font-bold text-green-600 mb-2" data-lang-en="Ride Comparison Apps:" data-lang-ar="تطبيقات مقارنة الرحلات:">Ride Comparison Apps:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="Only provide price comparison" data-lang-ar="توفر مقارنة الأسعار فقط">Only provide <span class="highlight" data-lang-en="price comparison" data-lang-ar="مقارنة الأسعار">price comparison</span></li>
+              <li data-lang-en="Redirect to other apps for booking" data-lang-ar="إعادة التوجيه إلى تطبيقات أخرى للحجز">Redirect to <span class="highlight" data-lang-en="other apps" data-lang-ar="تطبيقات أخرى">other apps</span> for booking</li>
+              <li data-lang-en="No direct relationship with drivers" data-lang-ar="لا توجد علاقة مباشرة مع السائقين">No <span class="highlight" data-lang-en="direct relationship" data-lang-ar="علاقة مباشرة">direct relationship</span> with drivers</li>
+              <li data-lang-en="Limited revenue model (ads or referrals)" data-lang-ar="نموذج إيرادات محدود (إعلانات أو إحالات)">Limited <span class="highlight" data-lang-en="revenue model" data-lang-ar="نموذج إيرادات">revenue model</span> (ads or referrals)</li>
+            </ul>
+          </div>
+
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="CORDR Advantages:" data-lang-ar="مزايا كوردر:">CORDR Advantages:</h3>
+            <ul class="list-disc list-inside">
+              <li data-lang-en="Complete ecosystem connecting all parties" data-lang-ar="نظام بيئي متكامل يربط جميع الأطراف">Complete <span class="highlight" data-lang-en="ecosystem" data-lang-ar="نظام بيئي">ecosystem</span> connecting all parties</li>
+              <li data-lang-en="SaaS model with recurring revenue" data-lang-ar="نموذج SaaS بإيرادات متكررة">SaaS model with recurring revenue</li>
+              <li data-lang-en="Regulatory compliance built-in" data-lang-ar="امتثال تنظيمي مدمج">Regulatory compliance built-in</li>
+              <li data-lang-en="Advanced analytics for all stakeholders" data-lang-ar="تحليلات متقدمة لجميع أصحاب المصلحة">Advanced analytics for all stakeholders</li>
+              <li data-lang-en="Multiple revenue streams (subscriptions, commissions, services)" data-lang-ar="مصادر إيرادات متعددة (اشتراكات، عمولات، خدمات)">Multiple revenue streams (subscriptions, commissions, services)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="w-1/2">
+          <div style="height: 350px;">
+            <canvas id="competitiveChart"></canvas>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-xl font-bold text-blue-600 mb-2" data-lang-en="Key Differentiators:" data-lang-ar="عوامل التمييز الرئيسية:">Key Differentiators:</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <h4 class="text-lg font-bold text-green-600 mb-1" data-lang-en="Regulatory Focus" data-lang-ar="التركيز التنظيمي"><i class="fas fa-shield-alt mr-2"></i> Regulatory Focus</h4>
+                <p class="text-sm" data-lang-en="Built-in compliance with local transportation regulations across different markets" data-lang-ar="امتثال مدمج للوائح النقل المحلية عبر الأسواق المختلفة">Built-in compliance with local transportation regulations across different markets</p>
+              </div>
+
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <h4 class="text-lg font-bold text-green-600 mb-1" data-lang-en="Advanced Analytics" data-lang-ar="تحليلات متقدمة"><i class="fas fa-chart-line mr-2"></i> Advanced Analytics</h4>
+                <p class="text-sm" data-lang-en="Real-time data insights for companies to optimize operations and pricing" data-lang-ar="رؤى بيانات في الوقت الفعلي للشركات لتحسين العمليات والتسعير">Real-time data insights for companies to optimize operations and pricing</p>
+              </div>
+
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <h4 class="text-lg font-bold text-green-600 mb-1" data-lang-en="Customization" data-lang-ar="التخصيص"><i class="fas fa-users-cog mr-2"></i> Customization</h4>
+                <p class="text-sm" data-lang-en="Tailored solutions for companies of all sizes with flexible integration options" data-lang-ar="حلول مخصصة للشركات من جميع الأحجام مع خيارات تكامل مرنة">Tailored solutions for companies of all sizes with flexible integration options</p>
+              </div>
+
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <h4 class="text-lg font-bold text-green-600 mb-1" data-lang-en="Driver Benefits" data-lang-ar="مزايا السائقين"><i class="fas fa-handshake mr-2"></i> Driver Benefits</h4>
+                <p class="text-sm" data-lang-en="Unique driver benefits program increasing loyalty and service quality" data-lang-ar="برنامج مزايا فريد للسائقين يزيد من الولاء وجودة الخدمة">Unique driver benefits program increasing loyalty and service quality</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Editable competitive data
+      const competitiveData = {
+        labels: [
+          'Unified Platform',
+          'Regulatory Compliance',
+          'Driver Benefits',
+          'Advanced Analytics',
+          'Multiple Revenue Streams',
+          'Customization Options'
+        ],
+        datasets: [
+          {
+            label: 'CORDR',
+            data: [9, 9, 8, 9, 8, 9],
+            fill: true,
+            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+            borderColor: 'rgba(76, 175, 80, 1)',
+            pointBackgroundColor: 'rgba(76, 175, 80, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(76, 175, 80, 1)'
+          },
+          {
+            label: 'Traditional Ride-Hailing Apps',
+            data: [3, 5, 4, 6, 3, 4],
+            fill: true,
+            backgroundColor: 'rgba(30, 136, 229, 0.2)',
+            borderColor: 'rgba(30, 136, 229, 1)',
+            pointBackgroundColor: 'rgba(30, 136, 229, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(30, 136, 229, 1)'
+          },
+          {
+            label: 'Ride Comparison Apps',
+            data: [6, 2, 1, 3, 2, 2],
+            fill: true,
+            backgroundColor: 'rgba(255, 152, 0, 0.2)',
+            borderColor: 'rgba(255, 152, 0, 1)',
+            pointBackgroundColor: 'rgba(255, 152, 0, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(255, 152, 0, 1)'
+          }
+        ]
+      };
+
+      // Create chart when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('competitiveChart');
+        if (ctx) {
+          const myChart = new Chart(ctx.getContext('2d'), {
+            type: 'radar',
+            data: competitiveData,
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              elements: {
+                line: {
+                  borderWidth: 3
+                }
+              },
+              plugins: {
+                title: {
+                  display: true,
+                  text: 'Competitive Analysis (Editable)',
+                  font: {
+                    size: 18
+                  }
+                }
+              },
+              scales: {
+                r: {
+                  angleLines: {
+                    display: true
+                  },
+                  suggestedMin: 0,
+                  suggestedMax: 10
+                }
+              }
+            }
+          });
+
+          // Add editing capability on click
+          ctx.onclick = function(evt) {
+            const activePoints = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+
+            if (activePoints.length > 0) {
+              const firstPoint = activePoints[0];
+              const datasetIndex = firstPoint.datasetIndex;
+              const index = firstPoint.index;
+              const category = myChart.data.labels[index];
+              const company = myChart.data.datasets[datasetIndex].label;
+              const value = myChart.data.datasets[datasetIndex].data[index];
+
+              const newValue = prompt(`Enter new value for ${company} in "${category}" (0-10):`, value);
+
+              if (newValue !== null && !isNaN(newValue) && newValue >= 0 && newValue <= 10) {
+                myChart.data.datasets[datasetIndex].data[index] = Number(newValue);
+                myChart.update();
+              }
+            }
+          };
+        }
+      });
+    </script>
+
+<div id="business_model" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Business Model & Financial Calculator" data-lang-ar="نموذج العمل والحاسبة المالية">Business Model & Financial Calculator</h2>
+
+        <div class="text-center py-16">
+            <div class="mb-8">
+                <i class="fas fa-calculator text-6xl text-blue-600 mb-4"></i>
+                <h3 class="text-3xl font-bold mb-4" data-lang-en="Interactive Financial Dashboard" data-lang-ar="لوحة التحكم المالية التفاعلية">Interactive Financial Dashboard</h3>
+                <p class="text-lg text-gray-600 mb-8" data-lang-en="Access our comprehensive B2B financial calculator with real-time analytics and revenue projections" data-lang-ar="الوصول إلى حاسبتنا المالية الشاملة مع التحليلات الفورية وتوقعات الإيرادات">Access our comprehensive B2B financial calculator with real-time analytics and revenue projections</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <i class="fas fa-chart-line text-3xl text-blue-600 mb-3"></i>
+                    <h4 class="font-bold mb-2" data-lang-en="Trip Profitability" data-lang-ar="ربحية الرحلة">Trip Profitability</h4>
+                    <p class="text-sm text-gray-600" data-lang-en="Calculate earnings per trip with customizable parameters" data-lang-ar="احسب الأرباح لكل رحلة مع معاملات قابلة للتخصيص">Calculate earnings per trip with customizable parameters</p>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <i class="fas fa-analytics text-3xl text-green-600 mb-3"></i>
+                    <h4 class="font-bold mb-2" data-lang-en="Revenue Analytics" data-lang-ar="تحليلات الإيرادات">Revenue Analytics</h4>
+                    <p class="text-sm text-gray-600" data-lang-en="Real-time dashboard with monthly, quarterly, and yearly projections" data-lang-ar="لوحة تحكم فورية مع توقعات شهرية وربع سنوية وسنوية">Real-time dashboard with monthly, quarterly, and yearly projections</p>
+                </div>
+                <div class="bg-purple-50 p-6 rounded-lg">
+                    <i class="fas fa-cogs text-3xl text-purple-600 mb-3"></i>
+                    <h4 class="font-bold mb-2" data-lang-en="B2B Revenue Models" data-lang-ar="نماذج إيرادات B2B">B2B Revenue Models</h4>
+                    <p class="text-sm text-gray-600" data-lang-en="Subscription management and additional services calculator" data-lang-ar="إدارة الاشتراكات وحاسبة الخدمات الإضافية">Subscription management and additional services calculator</p>
+                </div>
+            </div>
+
+            <a href="business_model_calculator.html" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-external-link-alt mr-3"></i>
+                <span data-lang-en="Open Financial Calculator" data-lang-ar="افتح الحاسبة المالية">Open Financial Calculator</span>
+            </a>
+
+            <p class="text-sm text-gray-500 mt-4" data-lang-en="Opens in a new dedicated page with full functionality" data-lang-ar="يفتح في صفحة مخصصة جديدة مع كامل الوظائف">Opens in a new dedicated page with full functionality</p>
+        </div>
+    </div>
+</div>
+
+<!-- Team Costs Section -->
+<div id="team_costs" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Team Structure & Costs" data-lang-ar="هيكل الفريق والتكاليف">Team Structure & Costs</h2>
+        <div class="text-center">
+            <div class="mb-8">
+                <i class="fas fa-users text-6xl text-blue-600 mb-4"></i>
+                <p class="text-lg text-gray-600 mb-6" data-lang-en="Detailed breakdown of team structure, development phases, and associated costs" data-lang-ar="تحليل مفصل لهيكل الفريق، مراحل التطوير، والتكاليف المرتبطة">Detailed breakdown of team structure, development phases, and associated costs</p>
+            </div>
+            <a href="team_costs_calculator.html" target="_blank" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-calculator mr-3"></i>
+                <span data-lang-en="Open Team & Costs Calculator" data-lang-ar="فتح حاسبة الفريق والتكاليف">Open Team & Costs Calculator</span>
+                <i class="fas fa-external-link-alt ml-3"></i>
+            </a>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
+                    <span data-lang-en="Development Phases" data-lang-ar="مراحل التطوير">Development Phases</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-users-cog mr-2 text-green-500"></i>
+                    <span data-lang-en="Core Team Breakdown" data-lang-ar="تفصيل الفريق الأساسي">Core Team Breakdown</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-money-bill-wave mr-2 text-purple-500"></i>
+                    <span data-lang-en="Additional Costs" data-lang-ar="تكاليف إضافية">Additional Costs</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="team_costs" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Team Structure & Costs" data-lang-ar="هيكل الفريق والتكاليف">Team Structure & Costs</h2>
+        <p class="text-lg text-gray-600 text-center mb-8" data-lang-en="Building the Right Team for Success" data-lang-ar="بناء الفريق المناسب للنجاح">Building the Right Team for Success</p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <div class="bg-orange-500 text-white rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-calendar-alt mr-2"></i><span data-lang-en="Development Phases" data-lang-ar="مراحل التطوير">Development Phases</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-orange-300 pb-2">
+                            <div>
+                                <strong data-lang-en="Phase 1 (Months 1-6)" data-lang-ar="المرحلة 1 (الأشهر 1-6)">Phase 1 (Months 1-6)</strong>: 
+                                <span data-lang-en="MVP Development" data-lang-ar="تطوير النموذج الأولي">MVP Development</span>
+                            </div>
+                            <span class="font-bold">$480K</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-orange-300 pb-2">
+                            <div>
+                                <strong data-lang-en="Phase 2 (Months 7-12)" data-lang-ar="المرحلة 2 (الأشهر 7-12)">Phase 2 (Months 7-12)</strong>: 
+                                <span data-lang-en="Market Launch" data-lang-ar="إطلاق السوق">Market Launch</span>
+                            </div>
+                            <span class="font-bold">$720K</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <strong data-lang-en="Phase 3 (Months 13-18)" data-lang-ar="المرحلة 3 (الأشهر 13-18)">Phase 3 (Months 13-18)</strong>: 
+                                <span data-lang-en="Scale & Expansion" data-lang-ar="التوسع والنمو">Scale & Expansion</span>
+                            </div>
+                            <span class="font-bold">$960K</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-500 text-white rounded-lg p-6 text-center">
+                    <h3 class="text-2xl font-bold mb-2">
+                        <i class="fas fa-calculator mr-2"></i><span data-lang-en="Total Investment Required" data-lang-ar="إجمالي الاستثمار المطلوب">Total Investment Required</span>
+                    </h3>
+                    <div class="text-4xl font-bold">$2,160,000</div>
+                    <p class="text-lg mt-2" data-lang-en="Over 18 months" data-lang-ar="على مدى 18 شهراً">Over 18 months</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-users mr-2"></i><span data-lang-en="Core Team Members" data-lang-ar="أعضاء الفريق الأساسي">Core Team Members</span>
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-blue-300 pb-2">
+                            <div>
+                                <strong data-lang-en="CEO/Founder" data-lang-ar="الرئيس التنفيذي/المؤسس">CEO/Founder</strong>
+                                <div class="text-sm opacity-80" data-lang-en="Strategic Leadership" data-lang-ar="القيادة الاستراتيجية">Strategic Leadership</div>
+                            </div>
+                            <span class="font-bold">$15,000/mo</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-300 pb-2">
+                            <div>
+                                <strong data-lang-en="CTO" data-lang-ar="مدير التكنولوجيا">CTO</strong>
+                                <div class="text-sm opacity-80" data-lang-en="Technical Leadership" data-lang-ar="القيادة التقنية">Technical Leadership</div>
+                            </div>
+                            <span class="font-bold">$12,000/mo</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-300 pb-2">
+                            <div>
+                                <strong data-lang-en="Lead Developer" data-lang-ar="مطور رئيسي">Lead Developer</strong>
+                                <div class="text-sm opacity-80" data-lang-en="Full-Stack Development" data-lang-ar="التطوير الشامل">Full-Stack Development</div>
+                            </div>
+                            <span class="font-bold">$8,000/mo</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-300 pb-2">
+                            <div>
+                                <strong data-lang-en="UI/UX Designer" data-lang-ar="مصمم واجهات">UI/UX Designer</strong>
+                                <div class="text-sm opacity-80" data-lang-en="User Experience" data-lang-ar="تجربة المستخدم">User Experience</div>
+                            </div>
+                            <span class="font-bold">$6,000/mo</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-blue-300 pb-2">
+                            <div>
+                                <strong data-lang-en="Marketing Manager" data-lang-ar="مدير التسويق">Marketing Manager</strong>
+                                <div class="text-sm opacity-80" data-lang-en="Growth & Acquisition" data-lang-ar="النمو والاستحواذ">Growth & Acquisition</div>
+                            </div>
+                            <span class="font-bold">$7,000/mo</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <strong data-lang-en="Operations Manager" data-lang-ar="مدير العمليات">Operations Manager</strong>
+                                <div class="text-sm opacity-80" data-lang-en="Business Operations" data-lang-ar="العمليات التجارية">Business Operations</div>
+                            </div>
+                            <span class="font-bold">$6,000/mo</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-blue-300">
+                        <div class="flex justify-between items-center">
+                            <strong data-lang-en="Monthly Team Cost" data-lang-ar="التكلفة الشهرية للفريق">Monthly Team Cost</strong>
+                            <span class="text-xl font-bold">$54,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-pink-500 to-red-500 text-white rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-chart-pie mr-2"></i><span data-lang-en="Additional Costs" data-lang-ar="التكاليف الإضافية">Additional Costs</span>
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span data-lang-en="Infrastructure & Tools" data-lang-ar="البنية التحتية والأدوات">Infrastructure & Tools</span>
+                            <span>$5,000/mo</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Office & Utilities" data-lang-ar="المكتب والمرافق">Office & Utilities</span>
+                            <span>$3,000/mo</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Legal & Compliance" data-lang-ar="القانونية والامتثال">Legal & Compliance</span>
+                            <span>$2,000/mo</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Marketing & Advertising" data-lang-ar="التسويق والإعلان">Marketing & Advertising</span>
+                            <span>$10,000/mo</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Contingency (10%)" data-lang-ar="احتياطي (10%)">Contingency (10%)</span>
+                            <span>$7,400/mo</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-pink-300">
+                        <div class="flex justify-between items-center">
+                            <strong data-lang-en="Total Monthly Burn" data-lang-ar="إجمالي الحرق الشهري">Total Monthly Burn</strong>
+                            <span class="text-xl font-bold">$81,400</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder sections for other content -->
+<div id="financials" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Financial Projections" data-lang-ar="التوقعات المالية">Financial Projections</h2>
+        <div class="text-center">
+            <div class="mb-8">
+                <i class="fas fa-chart-line text-6xl text-blue-600 mb-4"></i>
+                <p class="text-lg text-gray-600 mb-6" data-lang-en="Comprehensive financial analysis with interactive charts and projections" data-lang-ar="تحليل مالي شامل مع مخططات وتوقعات تفاعلية">Comprehensive financial analysis with interactive charts and projections</p>
+            </div>
+            <a href="financials_calculator.html" target="_blank" class="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-calculator mr-3"></i>
+                <span data-lang-en="Open Financial Calculator" data-lang-ar="فتح الحاسبة المالية">Open Financial Calculator</span>
+                <i class="fas fa-external-link-alt ml-3"></i>
+            </a>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-chart-bar mr-2 text-blue-500"></i>
+                    <span data-lang-en="Interactive Charts" data-lang-ar="مخططات تفاعلية">Interactive Charts</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-exchange-alt mr-2 text-green-500"></i>
+                    <span data-lang-en="Currency Switching" data-lang-ar="تبديل العملة">Currency Switching</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-edit mr-2 text-purple-500"></i>
+                    <span data-lang-en="Editable Projections" data-lang-ar="توقعات قابلة للتعديل">Editable Projections</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="investment" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Investment Opportunity" data-lang-ar="فرصة الاستثمار">Investment Opportunity</h2>
+        <div class="text-center">
+            <div class="mb-8">
+                <i class="fas fa-hand-holding-usd text-6xl text-green-600 mb-4"></i>
+                <p class="text-lg text-gray-600 mb-6" data-lang-en="Interactive investment calculator with funding stages, ROI projections, and expansion plans" data-lang-ar="حاسبة استثمار تفاعلية مع مراحل التمويل وتوقعات العائد وخطط التوسع">Interactive investment calculator with funding stages, ROI projections, and expansion plans</p>
+            </div>
+            <a href="investment_calculator.html" target="_blank" class="inline-flex items-center px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-chart-pie mr-3"></i>
+                <span data-lang-en="Open Investment Calculator" data-lang-ar="فتح حاسبة الاستثمار">Open Investment Calculator</span>
+                <i class="fas fa-external-link-alt ml-3"></i>
+            </a>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-coins mr-2 text-green-500"></i>
+                    <span data-lang-en="Funding Stages" data-lang-ar="مراحل التمويل">Funding Stages</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-chart-line mr-2 text-blue-500"></i>
+                    <span data-lang-en="ROI Projections" data-lang-ar="توقعات العائد">ROI Projections</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-expand-arrows-alt mr-2 text-purple-500"></i>
+                    <span data-lang-en="Expansion Plans" data-lang-ar="خطط التوسع">Expansion Plans</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="operational_costs" class="slide">
+    <div class="card">
+        <h2 data-lang-en="Operational Costs" data-lang-ar="التكاليف التشغيلية">Operational Costs</h2>
+        <div class="text-center">
+            <div class="mb-8">
+                <i class="fas fa-cogs text-6xl text-orange-600 mb-4"></i>
+                <p class="text-lg text-gray-600 mb-6" data-lang-en="Comprehensive operational cost management with charts, categories, and optimization tools" data-lang-ar="إدارة شاملة للتكاليف التشغيلية مع مخططات وفئات وأدوات تحسين">Comprehensive operational cost management with charts, categories, and optimization tools</p>
+            </div>
+            <a href="operational_costs_calculator.html" target="_blank" class="inline-flex items-center px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <i class="fas fa-calculator mr-3"></i>
+                <span data-lang-en="Open Operational Costs Calculator" data-lang-ar="فتح حاسبة التكاليف التشغيلية">Open Operational Costs Calculator</span>
+                <i class="fas fa-external-link-alt ml-3"></i>
+            </a>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-layer-group mr-2 text-orange-500"></i>
+                    <span data-lang-en="Cost Categories" data-lang-ar="فئات التكاليف">Cost Categories</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-chart-pie mr-2 text-blue-500"></i>
+                    <span data-lang-en="Visual Analytics" data-lang-ar="تحليلات بصرية">Visual Analytics</span>
+                </div>
+                <div class="flex items-center justify-center">
+                    <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
+                    <span data-lang-en="Optimization Tools" data-lang-ar="أدوات التحسين">Optimization Tools</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'en';
+
+    // Language switching
+    function switchLanguage(lang) {
+        currentLang = lang;
+        document.documentElement.lang = lang;
+        document.body.className = lang === 'ar' ? 'ar' : '';
+
+        // Update all elements with language attributes
+        document.querySelectorAll('[data-lang-en]').forEach(el => {
+            const translation = el.getAttribute(`data-lang-${lang}`);
+            if (translation) {
+                el.textContent = translation;
+            }
+        });
+
+        // Update language buttons
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
+    }
+
+    // Navigation and scroll tracking
+    function updateActiveNavigation() {
+        const sections = document.querySelectorAll('.slide');
+        const navLinks = document.querySelectorAll('.navbar a');
+        const navDots = document.querySelectorAll('.nav-dot');
+        const progressBar = document.getElementById('progressBar');
+
+        let current = '';
+        const scrollPosition = window.scrollY + 100;
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        // Update navigation links
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+
+        // Update navigation dots
+        navDots.forEach(dot => {
+            dot.classList.remove('active');
+            if (dot.getAttribute('data-section') === current) {
+                dot.classList.add('active');
+            }
+        });
+
+        // Update progress bar
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = (window.scrollY / totalHeight) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+
+    // Navigation dot click handlers
+    document.querySelectorAll('.nav-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+            const section = dot.getAttribute('data-section');
+            document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Scroll event listener
+    window.addEventListener('scroll', updateActiveNavigation);
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        updateActiveNavigation();
+
+        // Create market chart
+        const ctx = document.getElementById('marketChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['CORDR Target', 'Competitors', 'Untapped Market'],
+                    datasets: [{
+                        data: [15, 35, 50],
+                        backgroundColor: ['#3b82f6', '#ef4444', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
+

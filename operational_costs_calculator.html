@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-en="CORDR Operational Costs Calculator" data-lang-ar="حاسبة التكاليف التشغيلية لكوردر">CORDR Operational Costs Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <script src="shared_data.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; direction: ltr; }
+        body.ar { font-family: 'Tajawal', sans-serif; direction: rtl; }
+        .back-btn { position: fixed; top: 20px; left: 20px; z-index: 1000; background-color: #003366; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        body.ar .back-btn { left: auto; right: 20px; }
+        .back-btn:hover { background-color: #004080; transform: translateY(-2px); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 80px 20px 20px; }
+        .card { background-color: #ffffff; border-radius: 15px; padding: 30px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
+        h1 { color: #003366; font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
+        h2 { color: #003366; font-size: 1.8rem; font-weight: 600; margin-bottom: 1.5rem; }
+        h3 { color: #1e40af; font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; }
+        .input-field { border: 2px solid #e2e8f0; border-radius: 8px; padding: 10px 15px; font-size: 16px; transition: all 0.3s ease; }
+        .input-field:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; }
+        .btn-primary { background-color: #3b82f6; color: white; }
+        .btn-primary:hover { background-color: #2563eb; transform: translateY(-2px); }
+        .btn-success { background-color: #10b981; color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-sm { padding: 6px 12px; font-size: 14px; }
+        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
+        body.ar .lang-switcher { right: auto; left: 20px; }
+        .lang-btn { background-color: #e0e7ff; color: #3f51b5; border: 1px solid #3f51b5; padding: 8px 16px; cursor: pointer; border-radius: 6px; font-weight: 500; }
+        .lang-btn.active { background-color: #3f51b5; color: white; }
+        .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
+        .metric-label { font-size: 0.9rem; opacity: 0.9; }
+        .chart-container { height: 400px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background-color: #f8fafc; font-weight: 600; color: #374151; }
+        .category-card { border-left: 4px solid #3b82f6; background-color: #f8fafc; padding: 20px; margin: 15px 0; border-radius: 8px; }
+        .cost-item { background-color: #ffffff; border: 1px solid #e2e8f0; padding: 15px; margin: 10px 0; border-radius: 8px; transition: all 0.3s ease; }
+        .cost-item:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .editable-field { background-color: #f0f9ff; border: 2px dashed #3b82f6; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: inline-block; min-width: 80px; }
+        .editable-field:hover { background-color: #e0f2fe; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left mr-2"></i>
+        <span data-lang-en="Back to Main Presentation" data-lang-ar="العودة للعرض الرئيسي">Back to Main Presentation</span>
+    </a>
+
+    <div class="lang-switcher">
+        <button id="lang-en" class="lang-btn active" onclick="switchLanguage('en')">English</button>
+        <button id="lang-ar" class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+    </div>
+
+    <div class="container">
+        <h1 data-lang-en="CORDR Operational Costs Calculator" data-lang-ar="حاسبة التكاليف التشغيلية لكوردر">CORDR Operational Costs Calculator</h1>
+
+        <!-- Currency and Settings -->
+        <div class="card">
+            <div class="flex justify-between items-center mb-6">
+                <h2 data-lang-en="Cost Management Settings" data-lang-ar="إعدادات إدارة التكاليف">Cost Management Settings</h2>
+                <div class="flex gap-4 items-center">
+                    <label class="font-semibold" data-lang-en="Currency:" data-lang-ar="العملة:">Currency:</label>
+                    <select id="currency" class="input-field" onchange="updateCurrency()">
+                        <option value="USD">US Dollar (USD)</option>
+                        <option value="SAR">Saudi Riyal (SAR)</option>
+                    </select>
+                    <span id="exchangeRate" class="text-sm text-gray-600">1 USD = 3.75 SAR</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Overview -->
+        <div class="card">
+            <h2 data-lang-en="Cost Overview" data-lang-ar="نظرة عامة على التكاليف">Cost Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="metric-card">
+                    <div class="metric-value" id="totalMonthlyCosts">$0</div>
+                    <div class="metric-label" data-lang-en="Total Monthly Costs" data-lang-ar="إجمالي التكاليف الشهرية">Total Monthly Costs</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="totalAnnualCosts">$0</div>
+                    <div class="metric-label" data-lang-en="Total Annual Costs" data-lang-ar="إجمالي التكاليف السنوية">Total Annual Costs</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="highestCategory">-</div>
+                    <div class="metric-label" data-lang-en="Highest Cost Category" data-lang-ar="أعلى فئة تكلفة">Highest Cost Category</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="costPerUser">$0</div>
+                    <div class="metric-label" data-lang-en="Cost Per User/Month" data-lang-ar="التكلفة لكل مستخدم/شهر">Cost Per User/Month</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Add Cost Item -->
+        <div class="card">
+            <h2 data-lang-en="Add New Cost Item" data-lang-ar="إضافة بند تكلفة جديد">Add New Cost Item</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                <div>
+                    <label class="block font-semibold mb-2" data-lang-en="Item Name:" data-lang-ar="اسم البند:">Item Name:</label>
+                    <input type="text" id="newItemName" class="input-field w-full" placeholder="Enter cost item name">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-2" data-lang-en="Category:" data-lang-ar="الفئة:">Category:</label>
+                    <select id="newItemCategory" class="input-field w-full">
+                        <option value="Technology">Technology</option>
+                        <option value="Personnel">Personnel</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Operations">Operations</option>
+                        <option value="Legal & Compliance">Legal & Compliance</option>
+                        <option value="Office & Facilities">Office & Facilities</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold mb-2" data-lang-en="Monthly Cost:" data-lang-ar="التكلفة الشهرية:">Monthly Cost:</label>
+                    <input type="number" id="newItemCost" class="input-field w-full" value="0" min="0" step="0.01">
+                </div>
+                <div>
+                    <label class="block font-semibold mb-2" data-lang-en="Type:" data-lang-ar="النوع:">Type:</label>
+                    <select id="newItemType" class="input-field w-full">
+                        <option value="Fixed">Fixed</option>
+                        <option value="Variable">Variable</option>
+                        <option value="One-time">One-time</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button class="btn btn-success w-full" onclick="addCostItem()">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span data-lang-en="Add Item" data-lang-ar="إضافة بند">Add Item</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Categories -->
+        <div class="card">
+            <h2 data-lang-en="Cost Categories" data-lang-ar="فئات التكاليف">Cost Categories</h2>
+            <div id="costCategories">
+                <!-- Categories will be populated here -->
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card">
+                <h3 data-lang-en="Cost Distribution by Category" data-lang-ar="توزيع التكاليف حسب الفئة">Cost Distribution by Category</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3 data-lang-en="Monthly Cost Projection" data-lang-ar="توقعات التكاليف الشهرية">Monthly Cost Projection</h3>
+                <div class="chart-container">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Analysis -->
+        <div class="card">
+            <h2 data-lang-en="Cost Analysis & Optimization" data-lang-ar="تحليل وتحسين التكاليف">Cost Analysis & Optimization</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-blue-600 mb-3" data-lang-en="Fixed vs Variable Costs" data-lang-ar="التكاليف الثابتة مقابل المتغيرة">Fixed vs Variable Costs</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span data-lang-en="Fixed Costs:" data-lang-ar="التكاليف الثابتة:">Fixed Costs:</span>
+                            <span id="fixedCosts" class="font-bold">$0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Variable Costs:" data-lang-ar="التكاليف المتغيرة:">Variable Costs:</span>
+                            <span id="variableCosts" class="font-bold">$0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="One-time Costs:" data-lang-ar="التكاليف لمرة واحدة:">One-time Costs:</span>
+                            <span id="onetimeCosts" class="font-bold">$0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-green-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-green-600 mb-3" data-lang-en="Scaling Factors" data-lang-ar="عوامل التوسع">Scaling Factors</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium" data-lang-en="Expected Users:" data-lang-ar="المستخدمون المتوقعون:">Expected Users:</label>
+                            <input type="number" id="expectedUsers" class="input-field w-full" value="10000" onchange="updateCalculations()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium" data-lang-en="Growth Rate (%):" data-lang-ar="معدل النمو (%):">Growth Rate (%):</label>
+                            <input type="number" id="growthRate" class="input-field w-full" value="15" step="0.1" onchange="updateCalculations()">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-orange-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-orange-600 mb-3" data-lang-en="Cost Optimization" data-lang-ar="تحسين التكاليف">Cost Optimization</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span data-lang-en="Efficiency Score:" data-lang-ar="نقاط الكفاءة:">Efficiency Score:</span>
+                            <span id="efficiencyScore" class="font-bold">85%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span data-lang-en="Potential Savings:" data-lang-ar="الوفورات المحتملة:">Potential Savings:</span>
+                            <span id="potentialSavings" class="font-bold">$0</span>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-full mt-2" onclick="generateOptimizationReport()">
+                            <span data-lang-en="Generate Report" data-lang-ar="إنشاء تقرير">Generate Report</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Cost Table -->
+        <div class="card">
+            <h2 data-lang-en="Detailed Cost Breakdown" data-lang-ar="تفصيل التكاليف التفصيلي">Detailed Cost Breakdown</h2>
+            <div class="overflow-x-auto">
+                <table id="costTable">
+                    <thead>
+                        <tr>
+                            <th data-lang-en="Item Name" data-lang-ar="اسم البند">Item Name</th>
+                            <th data-lang-en="Category" data-lang-ar="الفئة">Category</th>
+                            <th data-lang-en="Type" data-lang-ar="النوع">Type</th>
+                            <th data-lang-en="Monthly Cost" data-lang-ar="التكلفة الشهرية">Monthly Cost</th>
+                            <th data-lang-en="Annual Cost" data-lang-ar="التكلفة السنوية">Annual Cost</th>
+                            <th data-lang-en="Actions" data-lang-ar="الإجراءات">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Cost items will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        let currentCurrency = 'USD';
+        const exchangeRate = 3.75;
+        let categoryChart, projectionChart;
+        
+        // Cost data structure
+        let costData = {
+            items: [
+                { name: 'Cloud Infrastructure (AWS/Azure)', category: 'Technology', type: 'Variable', monthlyCost: 5000 },
+                { name: 'Software Development Team', category: 'Personnel', type: 'Fixed', monthlyCost: 25000 },
+                { name: 'Digital Marketing Campaigns', category: 'Marketing', type: 'Variable', monthlyCost: 8000 },
+                { name: 'Customer Support Team', category: 'Personnel', type: 'Fixed', monthlyCost: 12000 },
+                { name: 'Legal & Compliance', category: 'Legal & Compliance', type: 'Fixed', monthlyCost: 3000 },
+                { name: 'Office Rent & Utilities', category: 'Office & Facilities', type: 'Fixed', monthlyCost: 6000 },
+                { name: 'Third-party APIs & Services', category: 'Technology', type: 'Variable', monthlyCost: 2500 },
+                { name: 'Insurance & Security', category: 'Operations', type: 'Fixed', monthlyCost: 1500 }
+            ],
+            expectedUsers: 10000,
+            growthRate: 15
+        };
+
+        // Language switching
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.body.className = lang === 'ar' ? 'ar' : '';
+            
+            document.querySelectorAll('[data-lang-en]').forEach(el => {
+                const translation = el.getAttribute(`data-lang-${lang}`);
+                if (translation) {
+                    el.textContent = translation;
+                }
+            });
+            
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            document.getElementById('lang-ar').classList.toggle('active', lang === 'ar');
+            
+            updateCharts();
+        }
+
+        // Currency conversion
+        function updateCurrency() {
+            currentCurrency = document.getElementById('currency').value;
+            updateCalculations();
+            updateCharts();
+        }
+
+        function formatCurrency(amount) {
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            const converted = amount * rate;
+            const symbol = currentCurrency === 'USD' ? '$' : 'SAR ';
+            const formatted = converted.toLocaleString();
+            return currentCurrency === 'USD' ? symbol + formatted : formatted + ' ' + symbol;
+        }
+
+        // Add cost item
+        function addCostItem() {
+            const name = document.getElementById('newItemName').value;
+            const category = document.getElementById('newItemCategory').value;
+            const cost = parseFloat(document.getElementById('newItemCost').value);
+            const type = document.getElementById('newItemType').value;
+
+            if (name && !isNaN(cost) && cost >= 0) {
+                costData.items.push({
+                    name: name,
+                    category: category,
+                    type: type,
+                    monthlyCost: cost
+                });
+
+                // Clear form
+                document.getElementById('newItemName').value = '';
+                document.getElementById('newItemCost').value = '0';
+
+                updateCalculations();
+                renderCostItems();
+                saveData();
+            } else {
+                alert(currentLang === 'ar' ? 'يرجى إدخال بيانات صحيحة لجميع الحقول.' : 'Please enter valid data for all fields.');
+            }
+        }
+
+        // Remove cost item
+        function removeCostItem(index) {
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذا البند؟' : 'Are you sure you want to delete this item?')) {
+                costData.items.splice(index, 1);
+                updateCalculations();
+                renderCostItems();
+                saveData();
+            }
+        }
+
+        // Edit cost item
+        function editCostItem(index, field) {
+            const item = costData.items[index];
+            const currentValue = item[field];
+            let newValue;
+
+            if (field === 'monthlyCost') {
+                newValue = prompt(
+                    currentLang === 'ar' ? 'أدخل التكلفة الشهرية الجديدة:' : 'Enter new monthly cost:',
+                    currentValue
+                );
+                if (newValue && !isNaN(newValue)) {
+                    item[field] = parseFloat(newValue);
+                }
+            } else {
+                newValue = prompt(
+                    currentLang === 'ar' ? 'أدخل القيمة الجديدة:' : 'Enter new value:',
+                    currentValue
+                );
+                if (newValue && newValue.trim() !== '') {
+                    item[field] = newValue.trim();
+                }
+            }
+
+            if (newValue) {
+                updateCalculations();
+                renderCostItems();
+                saveData();
+            }
+        }
+
+        // Update all calculations
+        function updateCalculations() {
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            let totalMonthly = 0;
+            let fixedCosts = 0;
+            let variableCosts = 0;
+            let onetimeCosts = 0;
+            
+            const categoryTotals = {};
+
+            costData.items.forEach(item => {
+                const cost = item.monthlyCost * rate;
+                totalMonthly += cost;
+
+                if (item.type === 'Fixed') fixedCosts += cost;
+                else if (item.type === 'Variable') variableCosts += cost;
+                else if (item.type === 'One-time') onetimeCosts += cost;
+
+                if (!categoryTotals[item.category]) {
+                    categoryTotals[item.category] = 0;
+                }
+                categoryTotals[item.category] += cost;
+            });
+
+            const totalAnnual = totalMonthly * 12;
+            const expectedUsers = parseInt(document.getElementById('expectedUsers').value) || 1;
+            const costPerUser = totalMonthly / expectedUsers;
+
+            // Find highest cost category
+            let highestCategory = '-';
+            let highestAmount = 0;
+            for (const [category, amount] of Object.entries(categoryTotals)) {
+                if (amount > highestAmount) {
+                    highestAmount = amount;
+                    highestCategory = category;
+                }
+            }
+
+            // Update displays
+            document.getElementById('totalMonthlyCosts').textContent = formatCurrency(totalMonthly);
+            document.getElementById('totalAnnualCosts').textContent = formatCurrency(totalAnnual);
+            document.getElementById('highestCategory').textContent = highestCategory;
+            document.getElementById('costPerUser').textContent = formatCurrency(costPerUser);
+
+            document.getElementById('fixedCosts').textContent = formatCurrency(fixedCosts);
+            document.getElementById('variableCosts').textContent = formatCurrency(variableCosts);
+            document.getElementById('onetimeCosts').textContent = formatCurrency(onetimeCosts);
+
+            // Calculate potential savings (simplified)
+            const potentialSavings = totalMonthly * 0.15; // Assume 15% potential savings
+            document.getElementById('potentialSavings').textContent = formatCurrency(potentialSavings);
+
+            updateCharts();
+        }
+
+        // Render cost items
+        function renderCostItems() {
+            const tableBody = document.getElementById('costTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            costData.items.forEach((item, index) => {
+                const row = tableBody.insertRow();
+                const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+                const monthlyCost = item.monthlyCost * rate;
+                const annualCost = monthlyCost * 12;
+
+                row.innerHTML = `
+                    <td><span class="editable-field" onclick="editCostItem(${index}, 'name')">${item.name}</span></td>
+                    <td><span class="editable-field" onclick="editCostItem(${index}, 'category')">${item.category}</span></td>
+                    <td><span class="editable-field" onclick="editCostItem(${index}, 'type')">${item.type}</span></td>
+                    <td><span class="editable-field" onclick="editCostItem(${index}, 'monthlyCost')">${formatCurrency(monthlyCost)}</span></td>
+                    <td>${formatCurrency(annualCost)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="removeCostItem(${index})">
+                            <i class="fas fa-trash mr-1"></i>
+                            <span data-lang-en="Delete" data-lang-ar="حذف">Delete</span>
+                        </button>
+                    </td>
+                `;
+            });
+
+            renderCostCategories();
+        }
+
+        // Render cost categories
+        function renderCostCategories() {
+            const container = document.getElementById('costCategories');
+            container.innerHTML = '';
+
+            const categoryTotals = {};
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+
+            costData.items.forEach(item => {
+                if (!categoryTotals[item.category]) {
+                    categoryTotals[item.category] = { total: 0, items: [] };
+                }
+                categoryTotals[item.category].total += item.monthlyCost * rate;
+                categoryTotals[item.category].items.push(item);
+            });
+
+            for (const [category, data] of Object.entries(categoryTotals)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-card';
+                categoryDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-lg font-bold text-blue-600">${category}</h4>
+                        <span class="text-xl font-bold">${formatCurrency(data.total)}</span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        ${data.items.length} ${currentLang === 'ar' ? 'بند' : 'items'} • 
+                        ${formatCurrency(data.total * 12)} ${currentLang === 'ar' ? 'سنوياً' : 'annually'}
+                    </div>
+                `;
+                container.appendChild(categoryDiv);
+            }
+        }
+
+        // Chart creation and updates
+        function createCharts() {
+            // Category Chart
+            const ctx1 = document.getElementById('categoryChart').getContext('2d');
+            categoryChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+                            '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: currentLang === 'ar' ? 'توزيع التكاليف حسب الفئة' : 'Cost Distribution by Category',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Projection Chart
+            const ctx2 = document.getElementById('projectionChart').getContext('2d');
+            projectionChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: currentLang === 'ar' ? 'التكاليف الشهرية المتوقعة' : 'Projected Monthly Costs',
+                        data: [],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: currentLang === 'ar' ? 'توقعات التكاليف الشهرية' : 'Monthly Cost Projection',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: currentCurrency === 'USD' ? 'Cost (USD)' : 'Cost (SAR)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (!categoryChart || !projectionChart) return;
+
+            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            const categoryTotals = {};
+
+            costData.items.forEach(item => {
+                if (!categoryTotals[item.category]) {
+                    categoryTotals[item.category] = 0;
+                }
+                categoryTotals[item.category] += item.monthlyCost * rate;
+            });
+
+            // Update category chart
+            categoryChart.data.labels = Object.keys(categoryTotals);
+            categoryChart.data.datasets[0].data = Object.values(categoryTotals);
+            categoryChart.update();
+
+            // Update projection chart
+            const months = [];
+            const projectedCosts = [];
+            const growthRate = parseFloat(document.getElementById('growthRate').value) / 100 || 0.15;
+            const baseCost = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+
+            for (let i = 1; i <= 12; i++) {
+                months.push(currentLang === 'ar' ? `الشهر ${i}` : `Month ${i}`);
+                const projectedCost = baseCost * Math.pow(1 + growthRate/12, i-1);
+                projectedCosts.push(projectedCost);
+            }
+
+            projectionChart.data.labels = months;
+            projectionChart.data.datasets[0].data = projectedCosts;
+            projectionChart.options.scales.y.title.text = currentCurrency === 'USD' ? 'Cost (USD)' : 'Cost (SAR)';
+            projectionChart.update();
+        }
+
+        // Generate optimization report
+        function generateOptimizationReport() {
+            const report = currentLang === 'ar' ? 
+                'تقرير تحسين التكاليف:\n\n1. يمكن تقليل تكاليف البنية التحتية السحابية بنسبة 20% من خلال التحسين\n2. دمج بعض الخدمات يمكن أن يوفر 15% من التكاليف\n3. إعادة التفاوض على العقود يمكن أن توفر 10% إضافية' :
+                'Cost Optimization Report:\n\n1. Cloud infrastructure costs can be reduced by 20% through optimization\n2. Consolidating some services could save 15% of costs\n3. Renegotiating contracts could save an additional 10%';
+            
+            alert(report);
+        }
+
+        // Data persistence
+        function saveData() {
+            const data = {
+                costData: costData,
+                currency: currentCurrency,
+                language: currentLang
+            };
+            localStorage.setItem('cordrOperationalCosts', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('cordrOperationalCosts');
+            if (saved) {
+                const data = JSON.parse(saved);
+                costData = data.costData || costData;
+                currentCurrency = data.currency || 'USD';
+                currentLang = data.language || 'en';
+                
+                document.getElementById('currency').value = currentCurrency;
+                document.getElementById('expectedUsers').value = costData.expectedUsers;
+                document.getElementById('growthRate').value = costData.growthRate;
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            switchLanguage(currentLang);
+            updateCalculations();
+            renderCostItems();
+            createCharts();
+        });
+    </script>
+</body>
+</html>
+
