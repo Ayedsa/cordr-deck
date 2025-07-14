@@ -315,19 +315,25 @@ class CordrDataManager {
     }
 }
 
-// Create global instance
-window.CordrData = new CordrDataManager();
+if (typeof window !== 'undefined') {
+    // Create global instance when running in the browser
+    window.CordrData = new CordrDataManager();
 
-// Helper functions for easy access
-window.getCordrData = (path) => window.CordrData.get(path);
-window.setCordrData = (path, value) => window.CordrData.set(path, value);
-window.updateCordrData = (updates) => window.CordrData.update(updates);
-window.subscribeCordrData = (callback, paths) => window.CordrData.subscribe(callback, paths);
+    // Helper functions for easy access
+    window.getCordrData = (path) => window.CordrData.get(path);
+    window.setCordrData = (path, value) => window.CordrData.set(path, value);
+    window.updateCordrData = (updates) => window.CordrData.update(updates);
+    window.subscribeCordrData = (callback, paths) => window.CordrData.subscribe(callback, paths);
 
-// Auto-sync derived values when business model changes
-window.CordrData.subscribe((data) => {
-    window.CordrData.calculateDerivedValues();
-}, ['businessModel.numTrips', 'businessModel.riderFare', 'businessModel.cordrFeeValue', 'businessModel.numCompanies', 'businessModel.subscriptionFee']);
+    // Auto-sync derived values when business model changes
+    window.CordrData.subscribe(() => {
+        window.CordrData.calculateDerivedValues();
+    }, ['businessModel.numTrips', 'businessModel.riderFare', 'businessModel.cordrFeeValue', 'businessModel.numCompanies', 'businessModel.subscriptionFee']);
 
-console.log('CORDR Data Management System initialized');
+    console.log('CORDR Data Management System initialized');
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CordrDataManager;
+}
 

@@ -1,0 +1,13 @@
+{
+  "name": "cordr-deck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "data_sync_ui.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
