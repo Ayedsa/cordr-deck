@@ -9,44 +9,252 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-    <script src="shared_data.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; direction: ltr; }
-        body.ar { font-family: 'Tajawal', sans-serif; direction: rtl; }
-        .back-btn { position: fixed; top: 20px; left: 20px; z-index: 1000; background-color: #003366; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f8f9fa; 
+            direction: ltr; 
+            color: #1f2937;
+            font-weight: 500;
+        }
+        body.ar { 
+            font-family: 'Tajawal', sans-serif; 
+            direction: rtl; 
+        }
+        .back-btn { 
+            position: fixed; 
+            top: 20px; 
+            left: 20px; 
+            z-index: 1000; 
+            background-color: #003366; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+        }
         body.ar .back-btn { left: auto; right: 20px; }
-        .back-btn:hover { background-color: #004080; transform: translateY(-2px); }
-        .container { max-width: 1400px; margin: 0 auto; padding: 80px 20px 20px; }
-        .card { background-color: #ffffff; border-radius: 15px; padding: 30px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); margin-bottom: 30px; }
-        h1 { color: #003366; font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
-        h2 { color: #003366; font-size: 1.8rem; font-weight: 600; margin-bottom: 1.5rem; }
-        h3 { color: #1e40af; font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; }
-        .input-field { border: 2px solid #e2e8f0; border-radius: 8px; padding: 10px 15px; font-size: 16px; transition: all 0.3s ease; }
-        .input-field:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; }
-        .btn-primary { background-color: #3b82f6; color: white; }
-        .btn-primary:hover { background-color: #2563eb; transform: translateY(-2px); }
-        .btn-success { background-color: #10b981; color: white; }
-        .btn-success:hover { background-color: #059669; }
-        .btn-danger { background-color: #ef4444; color: white; }
-        .btn-danger:hover { background-color: #dc2626; }
-        .btn-sm { padding: 6px 12px; font-size: 14px; }
-        .lang-switcher { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 10px; }
+        .back-btn:hover { 
+            background-color: #004080; 
+            transform: translateY(-2px); 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 80px 20px 20px; 
+        }
+        .card { 
+            background-color: #ffffff; 
+            border-radius: 15px; 
+            padding: 30px; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); 
+            margin-bottom: 30px; 
+        }
+        h1 { 
+            color: #003366; 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            text-align: center; 
+            margin-bottom: 2rem; 
+        }
+        h2 { 
+            color: #003366; 
+            font-size: 1.8rem; 
+            font-weight: 600; 
+            margin-bottom: 1.5rem; 
+        }
+        h3 { 
+            color: #1e40af; 
+            font-size: 1.3rem; 
+            font-weight: 600; 
+            margin-bottom: 1rem; 
+        }
+        .input-field { 
+            border: 2px solid #d1d5db; 
+            border-radius: 8px; 
+            padding: 12px 16px; 
+            font-size: 16px; 
+            font-weight: 500;
+            transition: all 0.3s ease; 
+            background-color: #ffffff;
+            color: #1f2937;
+        }
+        .input-field:focus { 
+            border-color: #3b82f6; 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); 
+            background-color: #f9fafb;
+        }
+        .input-field:hover {
+            border-color: #9ca3af;
+        }
+        .btn { 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            border: none; 
+        }
+        .btn-primary { 
+            background-color: #3b82f6; 
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background-color: #2563eb; 
+            transform: translateY(-2px); 
+        }
+        .btn-success { 
+            background-color: #10b981; 
+            color: white; 
+        }
+        .btn-success:hover { 
+            background-color: #059669; 
+        }
+        .btn-danger { 
+            background-color: #ef4444; 
+            color: white; 
+        }
+        .btn-danger:hover { 
+            background-color: #dc2626; 
+        }
+        .btn-sm { 
+            padding: 8px 16px; 
+            font-size: 14px; 
+        }
+        .lang-switcher { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            display: flex; 
+            gap: 10px; 
+        }
         body.ar .lang-switcher { right: auto; left: 20px; }
-        .lang-btn { background-color: #e0e7ff; color: #3f51b5; border: 1px solid #3f51b5; padding: 8px 16px; cursor: pointer; border-radius: 6px; font-weight: 500; }
-        .lang-btn.active { background-color: #3f51b5; color: white; }
-        .metric-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; }
-        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 5px; }
-        .metric-label { font-size: 0.9rem; opacity: 0.9; }
-        .chart-container { height: 400px; margin: 20px 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        th { background-color: #f8fafc; font-weight: 600; color: #374151; }
-        .category-card { border-left: 4px solid #3b82f6; background-color: #f8fafc; padding: 20px; margin: 15px 0; border-radius: 8px; }
-        .cost-item { background-color: #ffffff; border: 1px solid #e2e8f0; padding: 15px; margin: 10px 0; border-radius: 8px; transition: all 0.3s ease; }
-        .cost-item:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .editable-field { background-color: #f0f9ff; border: 2px dashed #3b82f6; padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; display: inline-block; min-width: 80px; }
-        .editable-field:hover { background-color: #e0f2fe; }
+        .lang-btn { 
+            background-color: #e0e7ff; 
+            color: #3f51b5; 
+            border: 2px solid #3f51b5; 
+            padding: 8px 16px; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            font-weight: 600; 
+        }
+        .lang-btn.active { 
+            background-color: #3f51b5; 
+            color: white; 
+        }
+        .metric-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center; 
+        }
+        .metric-value { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            margin-bottom: 5px; 
+        }
+        .metric-label { 
+            font-size: 0.9rem; 
+            opacity: 0.9; 
+        }
+        .chart-container { 
+            height: 400px; 
+            margin: 20px 0; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        th { 
+            background-color: #f8fafc; 
+            font-weight: 600; 
+            color: #374151; 
+        }
+        .category-card { 
+            border-left: 4px solid #3b82f6; 
+            background-color: #f8fafc; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+        }
+        .cost-item { 
+            background-color: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            transition: all 0.3s ease; 
+        }
+        .cost-item:hover { 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+        }
+        .editable-field { 
+            background-color: #ffffff; 
+            border: 2px solid #3b82f6; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: inline-block; 
+            min-width: 80px; 
+            font-weight: 500;
+            color: #1f2937;
+        }
+        .editable-field:hover { 
+            background-color: #f0f9ff; 
+            border-color: #2563eb;
+        }
+        .editable-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .inline-edit {
+            background-color: #ffffff;
+            border: 2px solid #3b82f6;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            min-width: 100px;
+        }
+        .inline-edit:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: #f9fafb;
+        }
+        .settings-panel {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .exchange-rate-input {
+            background-color: #ffffff;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            width: 100px;
+        }
+        .exchange-rate-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -65,15 +273,31 @@
 
         <!-- Currency and Settings -->
         <div class="card">
-            <div class="flex justify-between items-center mb-6">
-                <h2 data-lang-en="Cost Management Settings" data-lang-ar="إعدادات إدارة التكاليف">Cost Management Settings</h2>
-                <div class="flex gap-4 items-center">
-                    <label class="font-semibold" data-lang-en="Currency:" data-lang-ar="العملة:">Currency:</label>
-                    <select id="currency" class="input-field" onchange="updateCurrency()">
-                        <option value="USD">US Dollar (USD)</option>
-                        <option value="SAR">Saudi Riyal (SAR)</option>
-                    </select>
-                    <span id="exchangeRate" class="text-sm text-gray-600">1 USD = 3.75 SAR</span>
+            <div class="settings-panel">
+                <h2 data-lang-en="Calculator Settings" data-lang-ar="إعدادات الحاسبة">Calculator Settings</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block font-semibold mb-2" data-lang-en="Currency:" data-lang-ar="العملة:">Currency:</label>
+                        <select id="currency" class="input-field w-full" onchange="updateCurrency()">
+                            <option value="USD">US Dollar (USD)</option>
+                            <option value="SAR">Saudi Riyal (SAR)</option>
+                            <option value="EUR">Euro (EUR)</option>
+                            <option value="GBP">British Pound (GBP)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-2" data-lang-en="Exchange Rate (to USD):" data-lang-ar="سعر الصرف (إلى الدولار):">Exchange Rate (to USD):</label>
+                        <input type="number" id="exchangeRate" class="exchange-rate-input" value="3.75" step="0.01" onchange="updateExchangeRate()">
+                        <div class="text-sm text-gray-600 mt-1" id="exchangeRateDisplay">1 USD = 3.75 SAR</div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-2" data-lang-en="Number Format:" data-lang-ar="تنسيق الأرقام:">Number Format:</label>
+                        <select id="numberFormat" class="input-field w-full" onchange="updateCalculations()">
+                            <option value="comma">1,000,000</option>
+                            <option value="space">1 000 000</option>
+                            <option value="none">1000000</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,6 +435,10 @@
                             <span data-lang-en="Potential Savings:" data-lang-ar="الوفورات المحتملة:">Potential Savings:</span>
                             <span id="potentialSavings" class="font-bold">$0</span>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1" data-lang-en="Savings Rate (%):" data-lang-ar="معدل الوفورات (%):">Savings Rate (%):</label>
+                            <input type="number" id="savingsRate" class="input-field w-full" value="15" min="0" max="50" step="1" onchange="updateCalculations()">
+                        </div>
                         <button class="btn btn-primary btn-sm w-full mt-2" onclick="generateOptimizationReport()">
                             <span data-lang-en="Generate Report" data-lang-ar="إنشاء تقرير">Generate Report</span>
                         </button>
@@ -245,7 +473,12 @@
     <script>
         let currentLang = 'en';
         let currentCurrency = 'USD';
-        const exchangeRate = 3.75;
+        let exchangeRates = {
+            'USD': 1,
+            'SAR': 3.75,
+            'EUR': 0.85,
+            'GBP': 0.73
+        };
         let categoryChart, projectionChart;
         
         // Cost data structure
@@ -261,7 +494,8 @@
                 { name: 'Insurance & Security', category: 'Operations', type: 'Fixed', monthlyCost: 1500 }
             ],
             expectedUsers: 10000,
-            growthRate: 15
+            growthRate: 15,
+            savingsRate: 15
         };
 
         // Language switching
@@ -286,21 +520,57 @@
         // Currency conversion
         function updateCurrency() {
             currentCurrency = document.getElementById('currency').value;
+            document.getElementById('exchangeRate').value = exchangeRates[currentCurrency];
+            updateExchangeRateDisplay();
             updateCalculations();
             updateCharts();
         }
 
+        function updateExchangeRate() {
+            const rate = parseFloat(document.getElementById('exchangeRate').value);
+            if (rate > 0) {
+                exchangeRates[currentCurrency] = rate;
+                updateExchangeRateDisplay();
+                updateCalculations();
+            }
+        }
+
+        function updateExchangeRateDisplay() {
+            const rate = exchangeRates[currentCurrency];
+            document.getElementById('exchangeRateDisplay').textContent = `1 USD = ${rate} ${currentCurrency}`;
+        }
+
+        function formatNumber(num) {
+            const format = document.getElementById('numberFormat').value;
+            switch (format) {
+                case 'comma':
+                    return num.toLocaleString('en-US');
+                case 'space':
+                    return num.toLocaleString('fr-FR');
+                case 'none':
+                    return num.toString();
+                default:
+                    return num.toLocaleString();
+            }
+        }
+
         function formatCurrency(amount) {
-            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
+            const rate = exchangeRates[currentCurrency];
             const converted = amount * rate;
-            const symbol = currentCurrency === 'USD' ? '$' : 'SAR ';
-            const formatted = converted.toLocaleString();
-            return currentCurrency === 'USD' ? symbol + formatted : formatted + ' ' + symbol;
+            const symbols = {
+                'USD': '$',
+                'SAR': 'ر.س',
+                'EUR': '€',
+                'GBP': '£'
+            };
+            const symbol = symbols[currentCurrency] || currentCurrency;
+            const formatted = formatNumber(Math.round(converted));
+            return currentCurrency === 'SAR' ? `${formatted} ${symbol}` : `${symbol}${formatted}`;
         }
 
         // Add cost item
         function addCostItem() {
-            const name = document.getElementById('newItemName').value;
+            const name = document.getElementById('newItemName').value.trim();
             const category = document.getElementById('newItemCategory').value;
             const cost = parseFloat(document.getElementById('newItemCost').value);
             const type = document.getElementById('newItemType').value;
@@ -335,40 +605,74 @@
             }
         }
 
-        // Edit cost item
-        function editCostItem(index, field) {
+        // Edit cost item inline
+        function editCostItemInline(index, field, element) {
             const item = costData.items[index];
             const currentValue = item[field];
-            let newValue;
-
+            
             if (field === 'monthlyCost') {
-                newValue = prompt(
-                    currentLang === 'ar' ? 'أدخل التكلفة الشهرية الجديدة:' : 'Enter new monthly cost:',
-                    currentValue
-                );
-                if (newValue && !isNaN(newValue)) {
-                    item[field] = parseFloat(newValue);
-                }
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'inline-edit';
+                input.value = currentValue;
+                input.step = '0.01';
+                input.min = '0';
+                
+                input.onblur = function() {
+                    const newValue = parseFloat(this.value);
+                    if (!isNaN(newValue) && newValue >= 0) {
+                        item[field] = newValue;
+                        updateCalculations();
+                        renderCostItems();
+                        saveData();
+                    } else {
+                        renderCostItems();
+                    }
+                };
+                
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                };
+                
+                element.innerHTML = '';
+                element.appendChild(input);
+                input.focus();
+                input.select();
             } else {
-                newValue = prompt(
-                    currentLang === 'ar' ? 'أدخل القيمة الجديدة:' : 'Enter new value:',
-                    currentValue
-                );
-                if (newValue && newValue.trim() !== '') {
-                    item[field] = newValue.trim();
-                }
-            }
-
-            if (newValue) {
-                updateCalculations();
-                renderCostItems();
-                saveData();
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'inline-edit';
+                input.value = currentValue;
+                
+                input.onblur = function() {
+                    const newValue = this.value.trim();
+                    if (newValue) {
+                        item[field] = newValue;
+                        updateCalculations();
+                        renderCostItems();
+                        saveData();
+                    } else {
+                        renderCostItems();
+                    }
+                };
+                
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                };
+                
+                element.innerHTML = '';
+                element.appendChild(input);
+                input.focus();
+                input.select();
             }
         }
 
         // Update all calculations
         function updateCalculations() {
-            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
             let totalMonthly = 0;
             let fixedCosts = 0;
             let variableCosts = 0;
@@ -377,7 +681,7 @@
             const categoryTotals = {};
 
             costData.items.forEach(item => {
-                const cost = item.monthlyCost * rate;
+                const cost = item.monthlyCost;
                 totalMonthly += cost;
 
                 if (item.type === 'Fixed') fixedCosts += cost;
@@ -390,7 +694,7 @@
                 categoryTotals[item.category] += cost;
             });
 
-            const totalAnnual = totalMonthly * 12;
+            const totalAnnual = (totalMonthly - onetimeCosts) * 12 + onetimeCosts;
             const expectedUsers = parseInt(document.getElementById('expectedUsers').value) || 1;
             const costPerUser = totalMonthly / expectedUsers;
 
@@ -404,6 +708,10 @@
                 }
             }
 
+            // Calculate potential savings
+            const savingsRate = parseFloat(document.getElementById('savingsRate').value) / 100 || 0.15;
+            const potentialSavings = totalMonthly * savingsRate;
+
             // Update displays
             document.getElementById('totalMonthlyCosts').textContent = formatCurrency(totalMonthly);
             document.getElementById('totalAnnualCosts').textContent = formatCurrency(totalAnnual);
@@ -413,9 +721,6 @@
             document.getElementById('fixedCosts').textContent = formatCurrency(fixedCosts);
             document.getElementById('variableCosts').textContent = formatCurrency(variableCosts);
             document.getElementById('onetimeCosts').textContent = formatCurrency(onetimeCosts);
-
-            // Calculate potential savings (simplified)
-            const potentialSavings = totalMonthly * 0.15; // Assume 15% potential savings
             document.getElementById('potentialSavings').textContent = formatCurrency(potentialSavings);
 
             updateCharts();
@@ -428,15 +733,14 @@
 
             costData.items.forEach((item, index) => {
                 const row = tableBody.insertRow();
-                const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
-                const monthlyCost = item.monthlyCost * rate;
-                const annualCost = monthlyCost * 12;
+                const monthlyCost = item.monthlyCost;
+                const annualCost = item.type === 'One-time' ? monthlyCost : monthlyCost * 12;
 
                 row.innerHTML = `
-                    <td><span class="editable-field" onclick="editCostItem(${index}, 'name')">${item.name}</span></td>
-                    <td><span class="editable-field" onclick="editCostItem(${index}, 'category')">${item.category}</span></td>
-                    <td><span class="editable-field" onclick="editCostItem(${index}, 'type')">${item.type}</span></td>
-                    <td><span class="editable-field" onclick="editCostItem(${index}, 'monthlyCost')">${formatCurrency(monthlyCost)}</span></td>
+                    <td><span class="editable-field" onclick="editCostItemInline(${index}, 'name', this)">${item.name}</span></td>
+                    <td><span class="editable-field" onclick="editCostItemInline(${index}, 'category', this)">${item.category}</span></td>
+                    <td><span class="editable-field" onclick="editCostItemInline(${index}, 'type', this)">${item.type}</span></td>
+                    <td><span class="editable-field" onclick="editCostItemInline(${index}, 'monthlyCost', this)">${formatCurrency(monthlyCost)}</span></td>
                     <td>${formatCurrency(annualCost)}</td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="removeCostItem(${index})">
@@ -456,19 +760,19 @@
             container.innerHTML = '';
 
             const categoryTotals = {};
-            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
 
             costData.items.forEach(item => {
                 if (!categoryTotals[item.category]) {
                     categoryTotals[item.category] = { total: 0, items: [] };
                 }
-                categoryTotals[item.category].total += item.monthlyCost * rate;
+                categoryTotals[item.category].total += item.monthlyCost;
                 categoryTotals[item.category].items.push(item);
             });
 
             for (const [category, data] of Object.entries(categoryTotals)) {
                 const categoryDiv = document.createElement('div');
                 categoryDiv.className = 'category-card';
+                const annualTotal = data.total * 12;
                 categoryDiv.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
                         <h4 class="text-lg font-bold text-blue-600">${category}</h4>
@@ -476,7 +780,7 @@
                     </div>
                     <div class="text-sm text-gray-600">
                         ${data.items.length} ${currentLang === 'ar' ? 'بند' : 'items'} • 
-                        ${formatCurrency(data.total * 12)} ${currentLang === 'ar' ? 'سنوياً' : 'annually'}
+                        ${formatCurrency(annualTotal)} ${currentLang === 'ar' ? 'سنوياً' : 'annually'}
                     </div>
                 `;
                 container.appendChild(categoryDiv);
@@ -548,7 +852,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: currentCurrency === 'USD' ? 'Cost (USD)' : 'Cost (SAR)'
+                                text: `Cost (${currentCurrency})`
                             }
                         }
                     }
@@ -559,14 +863,13 @@
         function updateCharts() {
             if (!categoryChart || !projectionChart) return;
 
-            const rate = currentCurrency === 'SAR' ? exchangeRate : 1;
             const categoryTotals = {};
 
             costData.items.forEach(item => {
                 if (!categoryTotals[item.category]) {
                     categoryTotals[item.category] = 0;
                 }
-                categoryTotals[item.category] += item.monthlyCost * rate;
+                categoryTotals[item.category] += item.monthlyCost;
             });
 
             // Update category chart
@@ -588,15 +891,29 @@
 
             projectionChart.data.labels = months;
             projectionChart.data.datasets[0].data = projectedCosts;
-            projectionChart.options.scales.y.title.text = currentCurrency === 'USD' ? 'Cost (USD)' : 'Cost (SAR)';
+            projectionChart.options.scales.y.title.text = `Cost (${currentCurrency})`;
             projectionChart.update();
         }
 
         // Generate optimization report
         function generateOptimizationReport() {
+            const totalMonthly = costData.items.reduce((sum, item) => sum + item.monthlyCost, 0);
+            const savingsRate = parseFloat(document.getElementById('savingsRate').value) / 100;
+            const potentialSavings = totalMonthly * savingsRate;
+            
             const report = currentLang === 'ar' ? 
-                'تقرير تحسين التكاليف:\n\n1. يمكن تقليل تكاليف البنية التحتية السحابية بنسبة 20% من خلال التحسين\n2. دمج بعض الخدمات يمكن أن يوفر 15% من التكاليف\n3. إعادة التفاوض على العقود يمكن أن توفر 10% إضافية' :
-                'Cost Optimization Report:\n\n1. Cloud infrastructure costs can be reduced by 20% through optimization\n2. Consolidating some services could save 15% of costs\n3. Renegotiating contracts could save an additional 10%';
+                `تقرير تحسين التكاليف:\n\n` +
+                `• إجمالي التكاليف الشهرية: ${formatCurrency(totalMonthly)}\n` +
+                `• الوفورات المحتملة: ${formatCurrency(potentialSavings)} (${(savingsRate * 100).toFixed(1)}%)\n` +
+                `• يمكن تقليل تكاليف البنية التحتية السحابية بنسبة 20% من خلال التحسين\n` +
+                `• دمج بعض الخدمات يمكن أن يوفر 15% من التكاليف\n` +
+                `• إعادة التفاوض على العقود يمكن أن توفر 10% إضافية` :
+                `Cost Optimization Report:\n\n` +
+                `• Total Monthly Costs: ${formatCurrency(totalMonthly)}\n` +
+                `• Potential Savings: ${formatCurrency(potentialSavings)} (${(savingsRate * 100).toFixed(1)}%)\n` +
+                `• Cloud infrastructure costs can be reduced by 20% through optimization\n` +
+                `• Consolidating some services could save 15% of costs\n` +
+                `• Renegotiating contracts could save an additional 10%`;
             
             alert(report);
         }
@@ -606,7 +923,9 @@
             const data = {
                 costData: costData,
                 currency: currentCurrency,
-                language: currentLang
+                language: currentLang,
+                exchangeRates: exchangeRates,
+                numberFormat: document.getElementById('numberFormat').value
             };
             localStorage.setItem('cordrOperationalCosts', JSON.stringify(data));
         }
@@ -618,16 +937,21 @@
                 costData = data.costData || costData;
                 currentCurrency = data.currency || 'USD';
                 currentLang = data.language || 'en';
+                exchangeRates = data.exchangeRates || exchangeRates;
                 
                 document.getElementById('currency').value = currentCurrency;
+                document.getElementById('exchangeRate').value = exchangeRates[currentCurrency];
                 document.getElementById('expectedUsers').value = costData.expectedUsers;
                 document.getElementById('growthRate').value = costData.growthRate;
+                document.getElementById('savingsRate').value = costData.savingsRate || 15;
+                document.getElementById('numberFormat').value = data.numberFormat || 'comma';
             }
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
+            updateExchangeRateDisplay();
             switchLanguage(currentLang);
             updateCalculations();
             renderCostItems();
@@ -636,4 +960,3 @@
     </script>
 </body>
 </html>
-
